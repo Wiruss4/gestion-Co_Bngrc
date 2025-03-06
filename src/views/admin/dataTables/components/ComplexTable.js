@@ -15,6 +15,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import {
+  CheckCircleIcon, WarningIcon, TimeIcon, NotAllowedIcon, InfoIcon, CloseIcon,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
@@ -170,7 +171,7 @@ export default function ComplexTable(props) {
           fontWeight="700"
           lineHeight="100%"
         >
-          Complex Table
+          GARDE PAGE 
         </Text>
         <Menu />
       </Flex>

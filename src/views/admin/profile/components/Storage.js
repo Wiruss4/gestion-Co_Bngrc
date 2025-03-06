@@ -16,7 +16,7 @@ import React from "react";
 import { MdOutlineCloudDone } from "react-icons/md";
 
 export default function Banner(props) {
-  const { used, total= '20'} = props;
+  const { used, total } = props;
   // Chakra Color Mode
   const textColorPrimary = useColorModeValue("secondaryGray.900", "white");
   const brandColor = useColorModeValue("brand.500", "white");

@@ -1,3 +1,4 @@
+// frontend/src/views/admin/dataTables/components/DevelopmentTable.js
 'use client';
 /* eslint-disable */
 
@@ -14,6 +15,7 @@ import {
   Tr,
   useColorModeValue,
   Select,
+  useToast,
 } from '@chakra-ui/react';
 import {
   createColumnHelper,
@@ -24,6 +26,10 @@ import {
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import ImportPopup from "views/admin/dataTables/components/ImportPopup";
+import { handleImport } from "views/admin/dataTables/variables/imporDataDevelopment";
+
+
 
 // Custom components
 import Card from 'components/card/Card';
@@ -31,16 +37,54 @@ import Card from 'components/card/Card';
 const columnHelper = createColumnHelper();
 
 export default function ComplexTable() {
+  const toast = useToast();
   const [data, setData] = useState([]);
   const [sorting, setSorting] = useState([]);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
+
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [importedData, setImportedData] = useState([]);
+  const [regionExistante, setRegionExistante] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleFileUpload = (event) => {
+    handleImport(event, toast, setImportedData, setImportDialogOpen, setRegionExistante, setLoading);
+  };
+
+  //   const resetAllData = () => {
+  //     setData([]);               // ✅ Réinitialiser les données de la table
+  //     setImportedData([]);       // ✅ Vider les données importées
+  //     setRegions([]);            // ✅ Réinitialiser la liste des régions
+  //     setDistricts([]);          // ✅ Réinitialiser la liste des districts
+  //     setSelectedRegion('');     // ✅ Désélectionner la région
+  //     setSelectedDistrict('');   // ✅ Désélectionner le district
+  //     setImportDialogOpen(false); // ✅ Fermer le popup d'importation
+  //     localStorage.clear();      // ✅ Effacer toutes les données stockées dans le navigateur
+  //     window.location.reload();  // 🔄 Recharger la page pour tout réinitialiser
+  //     const resetAllData = () => {
+  //       setData([]);  // ✅ Vide la table
+  //       axios.get('http://localhost:4000/api/localisation-stats')
+  //         .then((response) => {
+  //           setData(response.data);  // ✅ Recharge les données depuis l'API
+  //         })
+  //         .catch((error) => console.error('Erreur API :', error));
+  //     };
+  //     localStorage.clear();  // ✅ Effacer toutes les données locales
+  // sessionStorage.clear(); // ✅ Effacer toutes les sessions actives
+
+  //   };
+
 
   // 🔹 États pour les filtres
   const [regions, setRegions] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
+
+  // 🔹 États pour la pagination
+  const [pageIndex, setPageIndex] = useState(0);
+  const rowsPerPage = 15; // 🔥 Nombre de lignes affichées
 
   // 🔥 Récupérer les données des localisations
   useEffect(() => {
@@ -49,25 +93,19 @@ export default function ComplexTable() {
       .then((response) => {
         setData(response.data);
 
-        // 🔹 Extraire les régions uniques
         const uniqueRegions = [...new Set(response.data.map((item) => item.nom_region))];
         setRegions(uniqueRegions);
 
-        // 🔥 Récupérer les valeurs enregistrées dans localStorage
         const savedRegion = localStorage.getItem('selectedRegion');
         const savedDistrict = localStorage.getItem('selectedDistrict');
 
-        if (savedRegion) {
-          setSelectedRegion(savedRegion);
-        }
-        if (savedDistrict) {
-          setSelectedDistrict(savedDistrict);
-        }
+        if (savedRegion) setSelectedRegion(savedRegion);
+        if (savedDistrict) setSelectedDistrict(savedDistrict);
       })
       .catch((error) => console.error('Erreur API :', error));
   }, []);
 
-  // 🔥 Mettre à jour les districts lorsqu'une région est sélectionnée
+  // 🔥 Mettre à jour les districts lorsqu'une région est sélectionnée...
   useEffect(() => {
     if (selectedRegion) {
       axios
@@ -78,7 +116,7 @@ export default function ComplexTable() {
         })
         .catch((error) => console.error('Erreur API (Districts) :', error));
     } else {
-      setDistricts([]); // Réinitialiser si aucune région sélectionnée
+      setDistricts([]);
     }
   }, [selectedRegion]);
 
@@ -96,23 +134,18 @@ export default function ComplexTable() {
       .catch((error) => console.error('Erreur API (Filtrage) :', error));
   }, [selectedRegion, selectedDistrict]);
 
-  // ✅ Fonction pour gérer la sélection d'une région
+  // ✅ Gestion des filtres
   const handleRegionChange = (e) => {
     const region = e.target.value;
     setSelectedRegion(region);
-    setSelectedDistrict(''); // Réinitialiser le district
-
-    // ✅ Enregistrer dans localStorage
+    setSelectedDistrict('');
     localStorage.setItem('selectedRegion', region);
-    localStorage.removeItem('selectedDistrict'); // Supprimer le district enregistré
+    localStorage.removeItem('selectedDistrict');
   };
 
-  // ✅ Fonction pour gérer la sélection d'un district
   const handleDistrictChange = (e) => {
     const district = e.target.value;
     setSelectedDistrict(district);
-
-    // ✅ Enregistrer dans localStorage
     localStorage.setItem('selectedDistrict', district);
   };
 
@@ -153,19 +186,29 @@ export default function ComplexTable() {
     getSortedRowModel: getSortedRowModel(),
   });
 
+  // 🔥 Gestion des flèches de navigation
+  const nextPage = () => {
+    if (pageIndex + rowsPerPage < data.length) {
+      setPageIndex(pageIndex + rowsPerPage);
+    }
+  };
+
+  const prevPage = () => {
+    if (pageIndex > 0) {
+      setPageIndex(pageIndex - rowsPerPage);
+    }
+  };
+
   return (
     <Card w="100%" px="0px">
       <Flex px="25px" mb="8px" justifyContent="space-between" align="center">
         <Text color={textColor} fontSize="30px" fontWeight="700">
-          GESTION DE DATA
+          REGION DE MADAGASCAR
         </Text>
 
         <Flex align="center" gap="10px">
-          <Button w="140px" minW="140px" variant="brand" fontWeight="500">
-            Import DATA
-          </Button>
 
-          {/* 🔥 Select Région */}
+
           <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedRegion} onChange={handleRegionChange}>
             <option value="">Sélectionner une Région</option>
             {regions.map((region) => (
@@ -175,7 +218,6 @@ export default function ComplexTable() {
             ))}
           </Select>
 
-          {/* 🔥 Select District */}
           <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedDistrict} onChange={handleDistrictChange} disabled={!selectedRegion}>
             <option value="">Tous les districts</option>
             {districts.map((district) => (
@@ -184,37 +226,87 @@ export default function ComplexTable() {
               </option>
             ))}
           </Select>
+          {/* <Button
+            colorScheme="red"
+            variant="outline"
+            onClick={resetAllData}
+          >
+            Réinitialiser les données
+          </Button> */}
+
+          <Button
+            as="label"
+            htmlFor="fileInput"
+            w="140px"
+            minW="140px"
+            variant="brand"
+            fontWeight="500"
+            cursor="pointer"
+          >
+            Import DATA
+          </Button>
+          <input
+            id="fileInput"
+            type="file"
+            accept=".xlsx"
+            style={{ display: "none" }}
+            onChange={handleFileUpload}
+          />
+          <ImportPopup
+            open={importDialogOpen}
+            onClose={() => {
+              setImportDialogOpen(false);
+              setImportedData([]); // ✅ Nettoie les données après fermeture
+            }}
+            importedData={importedData}
+            regionExistante={regionExistante}
+            handleConfirmImport={() => {
+              toast({
+                title: "✅ Importation terminée !",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+              });
+
+              // ✅ Nettoie les données après confirmation
+              setImportedData([]);
+              setImportDialogOpen(false);
+            }}
+
+          />
         </Flex>
       </Flex>
 
-      <Box>
+      <Box overflowX="auto">
         <Table variant="simple" color="gray.500" mb="24px" mt="12px">
-          <Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Th key={header.id} borderColor={borderColor}>
-                    <Flex justifyContent="space-between" align="center">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                    </Flex>
-                  </Th>
-                ))}
-              </Tr>
+          <Thead>{table.getHeaderGroups().map((headerGroup) => (
+            <Tr key={headerGroup.id}>{headerGroup.headers.map((header) => (
+              <Th key={header.id} borderColor={borderColor}>
+                {flexRender(header.column.columnDef.header, header.getContext())}
+              </Th>
             ))}
+            </Tr>
+          ))}
           </Thead>
-          <Tbody>
-            {table.getRowModel().rows.slice(0, 11).map((row) => (
-              <Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <Td key={cell.id} borderColor="transparent">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </Td>
-                ))}
-              </Tr>
+          <Tbody>{table.getRowModel().rows.slice(pageIndex, pageIndex + rowsPerPage).map((row) => (
+            <Tr key={row.id}>{row.getVisibleCells().map((cell) => (
+              <Td key={cell.id} borderColor="transparent">
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </Td>
             ))}
+            </Tr>
+          ))}
           </Tbody>
         </Table>
       </Box>
+
+      <Flex justifyContent="center" mt="10px" gap="20px">
+        <Button onClick={prevPage} isDisabled={pageIndex === 0}>◀</Button>
+        <Button onClick={nextPage} isDisabled={pageIndex + rowsPerPage >= data.length}>▶</Button>
+      </Flex>
     </Card>
+
+
+
   );
 }

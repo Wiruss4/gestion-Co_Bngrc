@@ -45,7 +45,7 @@ export default function ColumnTable(props) {
           fontSize={{ sm: '10px', lg: '12px' }}
           color="gray.400"
         >
-          NAME
+          NOM
         </Text>
       ),
       cell: (info) => (
@@ -56,8 +56,8 @@ export default function ColumnTable(props) {
         </Flex>
       ),
     }),
-    columnHelper.accessor('progress', {
-      id: 'progress',
+    columnHelper.accessor('LASTname', {
+      id: 'LASTname',
       header: () => (
         <Text
           justifyContent="space-between"
@@ -65,15 +65,36 @@ export default function ColumnTable(props) {
           fontSize={{ sm: '10px', lg: '12px' }}
           color="gray.400"
         >
-          PROGRESS
+          PRENOM
         </Text>
       ),
       cell: (info) => (
-        <Text color={textColor} fontSize="sm" fontWeight="700">
-          {info.getValue()}
-        </Text>
+        <Flex align="center">
+          <Text color={textColor} fontSize="sm" fontWeight="700">
+            {info.getValue()}
+          </Text>
+        </Flex>
       ),
     }),
+
+    // columnHelper.accessor('progress', {
+    //   id: 'progress',
+    //   header: () => (
+    //     <Text
+    //       justifyContent="space-between"
+    //       align="center"
+    //       fontSize={{ sm: '10px', lg: '12px' }}
+    //       color="gray.400"
+    //     >
+    //       PROGRESS
+    //     </Text>
+    //   ),
+    //   cell: (info) => (
+    //     <Text color={textColor} fontSize="sm" fontWeight="700">
+    //       {info.getValue()}
+    //     </Text>
+    //   ),
+    // }),
     columnHelper.accessor('quantity', {
       id: 'quantity',
       header: () => (
@@ -83,7 +104,7 @@ export default function ColumnTable(props) {
           fontSize={{ sm: '10px', lg: '12px' }}
           color="gray.400"
         >
-          QUANTITY
+          CONTACT
         </Text>
       ),
       cell: (info) => (
@@ -92,24 +113,24 @@ export default function ColumnTable(props) {
         </Text>
       ),
     }),
-    columnHelper.accessor('date', {
-      id: 'date',
-      header: () => (
-        <Text
-          justifyContent="space-between"
-          align="center"
-          fontSize={{ sm: '10px', lg: '12px' }}
-          color="gray.400"
-        >
-          DATE
-        </Text>
-      ),
-      cell: (info) => (
-        <Text color={textColor} fontSize="sm" fontWeight="700">
-          {info.getValue()}
-        </Text>
-      ),
-    }),
+    // columnHelper.accessor('date', {
+    //   id: 'date',
+    //   header: () => (
+    //     <Text
+    //       justifyContent="space-between"
+    //       align="center"
+    //       fontSize={{ sm: '10px', lg: '12px' }}
+    //       color="gray.400"
+    //     >
+    //       DATE
+    //     </Text>
+    //   ),
+    //   cell: (info) => (
+    //     <Text color={textColor} fontSize="sm" fontWeight="700">
+    //       {info.getValue()}
+    //     </Text>
+    //   ),
+    // }),
   ];
   const [data, setData] = React.useState(() => [...defaultData]);
   const table = useReactTable({
@@ -138,7 +159,7 @@ export default function ColumnTable(props) {
           fontWeight="700"
           lineHeight="100%"
         >
-          4-Columns Table
+          Liste Des Responsable Site
         </Text>
         <Menu />
       </Flex>
