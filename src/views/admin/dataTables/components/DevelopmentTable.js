@@ -201,39 +201,56 @@ export default function ComplexTable() {
 
   return (
     <Card w="100%" px="0px">
-      <Flex px="25px" mb="8px" justifyContent="space-between" align="center">
+      <Flex
+        px="25px"
+        mb="8px"
+        justifyContent="space-between"
+        align="center"
+        flexWrap="wrap"
+        gap="10px"
+      >
+        {/* Titre */}
         <Text color={textColor} fontSize="30px" fontWeight="700">
           REGION DE MADAGASCAR
         </Text>
-
-        <Flex align="center" gap="10px">
-
-
-          <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedRegion} onChange={handleRegionChange}>
-            <option value="">Sélectionner une Région</option>
-            {regions.map((region) => (
-              <option key={region} value={region}>
-                {region}
-              </option>
-            ))}
-          </Select>
-
-          <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedDistrict} onChange={handleDistrictChange} disabled={!selectedRegion}>
-            <option value="">Tous les districts</option>
-            {districts.map((district) => (
-              <option key={district} value={district}>
-                {district}
-              </option>
-            ))}
-          </Select>
-          {/* <Button
-            colorScheme="red"
-            variant="outline"
-            onClick={resetAllData}
-          >
-            Réinitialiser les données
-          </Button> */}
-
+  
+        {/* Conteneur des sélections et du bouton Import */}
+        <Flex align="center" gap="10px" wrap="wrap">
+          {/* Empilement vertical des sélections */}
+          <Flex direction="column" gap="10px">
+            <Select
+              fontSize="sm"
+              variant="subtle"
+              fontWeight="700"
+              value={selectedRegion}
+              onChange={handleRegionChange}
+            >
+              <option value="">Région</option>
+              {regions.map((region) => (
+                <option key={region} value={region}>
+                  {region}
+                </option>
+              ))}
+            </Select>
+  
+            <Select
+              fontSize="sm"
+              variant="subtle"
+              fontWeight="700"
+              value={selectedDistrict}
+              onChange={handleDistrictChange}
+              disabled={!selectedRegion}
+            >
+              <option value="">Tous les districts</option>
+              {districts.map((district) => (
+                <option key={district} value={district}>
+                  {district}
+                </option>
+              ))}
+            </Select>
+          </Flex>
+  
+          {/* Bouton Import aligné à droite */}
           <Button
             as="label"
             htmlFor="fileInput"
@@ -242,6 +259,7 @@ export default function ComplexTable() {
             variant="brand"
             fontWeight="500"
             cursor="pointer"
+            alignSelf="center"
           >
             Import DATA
           </Button>
@@ -252,11 +270,12 @@ export default function ComplexTable() {
             style={{ display: "none" }}
             onChange={handleFileUpload}
           />
+  
           <ImportPopup
             open={importDialogOpen}
             onClose={() => {
               setImportDialogOpen(false);
-              setImportedData([]); // ✅ Nettoie les données après fermeture
+              setImportedData([]);
             }}
             importedData={importedData}
             regionExistante={regionExistante}
@@ -267,46 +286,48 @@ export default function ComplexTable() {
                 duration: 5000,
                 isClosable: true,
               });
-
-              // ✅ Nettoie les données après confirmation
               setImportedData([]);
               setImportDialogOpen(false);
             }}
-
           />
         </Flex>
       </Flex>
-
+  
+      {/* Conteneur avec scroll horizontal */}
       <Box overflowX="auto">
-        <Table variant="simple" color="gray.500" mb="24px" mt="12px">
-          <Thead>{table.getHeaderGroups().map((headerGroup) => (
-            <Tr key={headerGroup.id}>{headerGroup.headers.map((header) => (
-              <Th key={header.id} borderColor={borderColor}>
-                {flexRender(header.column.columnDef.header, header.getContext())}
-              </Th>
+        <Table variant="simple" color="gray.500" mb="24px" mt="12px" minWidth="600px">
+          <Thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <Tr key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <Th key={header.id} borderColor={borderColor}>
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                  </Th>
+                ))}
+              </Tr>
             ))}
-            </Tr>
-          ))}
           </Thead>
-          <Tbody>{table.getRowModel().rows.slice(pageIndex, pageIndex + rowsPerPage).map((row) => (
-            <Tr key={row.id}>{row.getVisibleCells().map((cell) => (
-              <Td key={cell.id} borderColor="transparent">
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </Td>
+          <Tbody>
+            {table.getRowModel().rows.slice(pageIndex, pageIndex + rowsPerPage).map((row) => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <Td key={cell.id} borderColor="transparent">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Td>
+                ))}
+              </Tr>
             ))}
-            </Tr>
-          ))}
           </Tbody>
         </Table>
       </Box>
-
+  
+      {/* Pagination */}
       <Flex justifyContent="center" mt="10px" gap="20px">
         <Button onClick={prevPage} isDisabled={pageIndex === 0}>◀</Button>
         <Button onClick={nextPage} isDisabled={pageIndex + rowsPerPage >= data.length}>▶</Button>
       </Flex>
     </Card>
-
-
-
   );
+  
+  
 }

@@ -123,7 +123,7 @@ export default function HeaderLinks(props) {
         >
           <Flex w="100%" mb="20px">
             <Text fontSize="md" fontWeight="600" color={textColor}>
-              Notifications
+              IMPORTATION
             </Text>
             <Text
               fontSize="sm"
@@ -132,7 +132,7 @@ export default function HeaderLinks(props) {
               ms="auto"
               cursor="pointer"
             >
-              Mark all read
+              Tout lu
             </Text>
           </Flex>
           <Flex flexDirection="column">
@@ -143,7 +143,7 @@ export default function HeaderLinks(props) {
               borderRadius="8px"
               mb="10px"
             >
-              <ItemContent info="Horizon UI Dashboard PRO" />
+              <ItemContent info="Region ANALAMANGA importer" />
             </MenuItem>
             <MenuItem
               _hover={{ bg: 'none' }}
@@ -152,7 +152,7 @@ export default function HeaderLinks(props) {
               borderRadius="8px"
               mb="10px"
             >
-              <ItemContent info="Horizon Design System Free" />
+              <ItemContent info="Region SAVA importer" />
             </MenuItem>
           </Flex>
         </MenuList>
@@ -182,14 +182,22 @@ export default function HeaderLinks(props) {
         >
           <Image src={navImage} borderRadius="16px" mb="28px" />
           <Flex flexDirection="column">
-            <Link w="100%" href="https://horizon-ui.com/pro">
-              <Button w="100%" h="44px" mb="10px" variant="brand">
-                Buy Horizon UI PRO
-              </Button>
-            </Link>
             <Link
               w="100%"
-              href="https://horizon-ui.com/documentation/docs/introduction"
+              href="https://bngrc.gov.mg/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button w="100%" h="44px" mb="10px" variant="brand">
+                Visit web site BNGRC
+              </Button>
+            </Link>
+
+            <Link
+              w="100%"
+              href="https://bngrc.gov.mg/"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <Button
                 w="100%"
@@ -199,12 +207,15 @@ export default function HeaderLinks(props) {
                 bg="transparent"
                 borderColor={borderButton}
               >
-                See Documentation
+                SCAPR BNGRC
               </Button>
             </Link>
+
             <Link
               w="100%"
-              href="https://github.com/horizon-ui/horizon-ui-chakra-ts"
+              href="https://www.facebook.com/BNGRCMID/"
+              target="_blank"
+              rel="noopener noreferrer"
             >
               <Button
                 w="100%"
@@ -213,7 +224,7 @@ export default function HeaderLinks(props) {
                 color={textColor}
                 bg="transparent"
               >
-                Try Horizon Free
+                facebook BNGRC
               </Button>
             </Link>
           </Flex>
@@ -270,7 +281,7 @@ export default function HeaderLinks(props) {
               fontWeight="700"
               color={textColor}
             >
-              👋&nbsp; Hey, Adela
+              👋&nbsp; Hey Danis
             </Text>
           </Flex>
           <Flex flexDirection="column" p="10px">
@@ -280,7 +291,7 @@ export default function HeaderLinks(props) {
               borderRadius="8px"
               px="14px"
             >
-              <Text fontSize="sm">Profile Settings</Text>
+              <Text fontSize="sm">Profil</Text>
             </MenuItem>
             <MenuItem
               _hover={{ bg: 'none' }}
@@ -288,7 +299,7 @@ export default function HeaderLinks(props) {
               borderRadius="8px"
               px="14px"
             >
-              <Text fontSize="sm">Newsletter Settings</Text>
+              <Text fontSize="sm">Ouvrir</Text>
             </MenuItem>
             <MenuItem
               _hover={{ bg: 'none' }}
