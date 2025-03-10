@@ -16,7 +16,7 @@ export default function GeneralInformation(props) {
     "unset"
   );
   return (
-    <Card mb={{ base: "330px", "0": "20px" }} {...rest}>
+    <Card mb={{ base: "0px", "2xl": "20px" }} {...rest}>
       <Text
         color={textColorPrimary}
         fontWeight='bold'
