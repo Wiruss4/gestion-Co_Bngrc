@@ -58,8 +58,8 @@ export default function AdminNavbar(props) {
       filter={navbarFilter}
       backdropFilter={navbarBackdrop}
       backgroundPosition='center'
-      backgroundSize='cover'
-      borderRadius='16px'
+      // backgroundSize='cover'
+      // borderRadius='16px'
       borderWidth='1.5px'
       borderStyle='solid'
       transitionDelay='0s, 0s, 0s, 0s'

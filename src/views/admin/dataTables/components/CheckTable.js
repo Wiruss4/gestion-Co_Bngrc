@@ -1,3 +1,4 @@
+// frontend/src/views/admin/dataTables/components/CheckTable.js
 /* eslint-disable */
 import {
   Flex,
