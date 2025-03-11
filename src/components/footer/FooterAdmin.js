@@ -45,7 +45,7 @@ export default function Footer() {
             // href='https://www.simmmple.com?ref=horizon-chakra-free'
             target='_blank'
             fontWeight='700'>
-            Michel Danis
+            Michel Danis & Alson Nahdi
           </Link>
         </Text>
       </Text>

@@ -50,126 +50,119 @@ const columnHelper = createColumnHelper();
 
 export default function SiteTable() {
   const toast = useToast();
-  const [data, setData] = useState([]); // Données pour les filtres
   const [sites, setSites] = useState([]); // Liste des sites affichés
-  const [selectedRows, setSelectedRows] = useState([]); // Sites sélectionnés pour suppression
+  const [locations, setLocations] = useState({ regions: [], districts: [], communes: [], fokontanys: [] });
+  const [selectedRows, setSelectedRows] = useState([]);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedSiteToDelete, setSelectedSiteToDelete] = useState(null);
   const [isSitePopupOpen, setIsSitePopupOpen] = useState(false);
   const [selectedSiteData, setSelectedSiteData] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
+  // ✅ États pour les filtres
   const [selectedRegion, setSelectedRegion] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedCommune, setSelectedCommune] = useState('');
   const [selectedFokontany, setSelectedFokontany] = useState('');
 
-  const cancelRef = useRef(); // Pour la popup de suppression
-  const [pageIndex, setPageIndex] = useState(0); // ✅ Ajout de l'état
-  const rowsPerPage = 15; // ✅ Nombre de lignes par page
-  const [sorting, setSorting] = useState([]); // 🔥 Gère le tri des colonnes
+  const cancelRef = useRef();
+  const [pageIndex, setPageIndex] = useState(0);
+  const rowsPerPage = 5;
+  const [sorting, setSorting] = useState([]);
 
   // ✅ Style pour le mode clair/sombre
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
 const [selectedSite, setSelectedSite] = useState(null); // Site sélectionné pour suppression
 
+const regions = locations.regions;
+const districts = selectedRegion ? locations.districts.filter(d => d.nom_region === selectedRegion) : [];
+const communes = selectedDistrict ? locations.communes.filter(c => c.nom_district === selectedDistrict) : [];
+const fokontanys = selectedCommune ? locations.fokontanys.filter(f => f.nom_commune === selectedCommune) : [];
 
   
 
   // ✅ États pour la gestion de la popup d'ajout/modification
   const [selectedSitesites, setSelectedSitesites] = useState(null);
 
-     // ✅ Charger toutes les données nécessaires pour les filtres
+     // ✅ Charger les options des filtres depuis l'API
   useEffect(() => {
     axios
-      .get('http://localhost:4000/api/suivi-site-hebergement-full')
+      .get('http://localhost:4000/api/site-hebergement/locations')
       .then((response) => {
-        console.log("📢 Données chargées :", response.data);
-        setData(response.data);
+        console.log("📢 Lieux chargés :", response.data);
+        setLocations(response.data);
       })
-      .catch((error) => console.error('❌ Erreur API:', error));
+      .catch((error) => console.error('❌ Erreur API (locations) :', error));
   }, []);
+ // ✅ Charger les sites en fonction des filtres sélectionnés
+ useEffect(() => {
+  let url = 'http://localhost:4000/api/site-hebergement';
+  const params = new URLSearchParams();
 
-    // ✅ Charger les sites en fonction des filtres sélectionnés
-  useEffect(() => {
-    let url = 'http://localhost:4000/api/site-hebergement';
-    const params = new URLSearchParams();
+  if (selectedRegion) params.append('region', selectedRegion);
+  if (selectedDistrict) params.append('district', selectedDistrict);
+  if (selectedCommune) params.append('commune', selectedCommune);
+  if (selectedFokontany) params.append('fokontany', selectedFokontany);
 
-    if (selectedRegion) params.append('region', selectedRegion);
-    if (selectedDistrict) params.append('district', selectedDistrict);
-    if (selectedCommune) params.append('commune', selectedCommune);
-    if (selectedFokontany) params.append('fokontany', selectedFokontany);
+  axios
+    .get(`${url}?${params.toString()}`)
+    .then((response) => {
+      console.log("📢 Sites chargés :", response.data);
+      setSites(response.data);
+    })
+    .catch((error) => console.error('❌ Erreur API Sites:', error));
+}, [selectedRegion, selectedDistrict, selectedCommune, selectedFokontany]);
 
-    axios
-      .get(`${url}?${params.toString()}`)
-      .then((response) => {
-        console.log("📢 Sites chargés :", response.data);
-        setSites(response.data);
-      })
-      .catch((error) => console.error('❌ Erreur API Sites:', error));
-  }, [selectedRegion, selectedDistrict, selectedCommune, selectedFokontany]);
+  
+useEffect(() => {
+  console.log("📢 L'API `suivi-site-hebergement-full` est supprimée. On utilise maintenant `site-hebergement`.");
+}, [selectedRegion, selectedCommune, selectedFokontany]);
 
-     // ✅ Extraire les options des filtres
-  const regions = [...new Set(data.map(item => item.nom_region))];
-  const districts = selectedRegion ? [...new Set(data.filter(item => item.nom_region === selectedRegion).map(item => item.nom_district))] : [];
-  const communes = selectedDistrict ? [...new Set(data.filter(item => item.nom_district === selectedDistrict).map(item => item.nom_commune))] : [];
-  const fokontanys = selectedCommune ? [...new Set(data.filter(item => item.nom_commune === selectedCommune).map(item => item.nom_fokontany))] : [];
+ 
+ // ✅ Gestion des sélections
+ const handleRegionChange = (e) => {
+  setSelectedRegion(e.target.value);
+  setSelectedDistrict('');
+  setSelectedCommune('');
+  setSelectedFokontany('');
+};
 
+const handleDistrictChange = (e) => {
+  setSelectedDistrict(e.target.value);
+  setSelectedCommune('');
+  setSelectedFokontany('');
+};
 
+const handleCommuneChange = (e) => {
+  setSelectedCommune(e.target.value);
+  setSelectedFokontany('');
+};
 
-  // ✅ Filtrer les données des suivis selon les critères sélectionnés
-  useEffect(() => {
-    if (!selectedRegion && !selectedCommune && !selectedFokontany) {
-      setSites([]);
-      return;
-    }
-
-    let url = 'http://localhost:4000/api/suivi-site-hebergement-full';
-    const params = new URLSearchParams();
-
-    if (selectedRegion) params.append('region', selectedRegion);
-    if (selectedCommune) params.append('commune', selectedCommune);
-    if (selectedFokontany) params.append('fokontany', selectedFokontany);
-
-    axios
-      .get(`${url}?${params.toString()}`)
-      .then((response) => {
-        console.log('📢 Données API Suivi :', response.data);
-        setSites(response.data);
-      })
-      .catch((error) => console.error('❌ Erreur API (Filtrage) :', error));
-  }, [selectedRegion, selectedCommune, selectedFokontany]);
-
-  // ✅ Gestion des sélections
-  const handleRegionChange = (e) => {
-    setSelectedRegion(e.target.value);
-    setSelectedDistrict('');
-    setSelectedCommune('');
-    setSelectedFokontany('');
-  };
-
-  const handleDistrictChange = (e) => {
-    setSelectedDistrict(e.target.value);
-    setSelectedCommune('');
-    setSelectedFokontany('');
-  };
-
-  const handleCommuneChange = (e) => {
-    setSelectedCommune(e.target.value);
-    setSelectedFokontany('');
-  };
-
-  const handleFokontanyChange = (e) => {
-    setSelectedFokontany(e.target.value);
-  };
+const handleFokontanyChange = (e) => {
+  setSelectedFokontany(e.target.value);
+};
 
 
-  // ✅ Fonction pour changer le site
-  const handleSiteChange = (e) => {
-    const site = e.target.value;
-    setSelectedSite(site);
-    localStorage.setItem('selectedSite', site);
-  };
+  // ✅ Fonction pour charger les sites
+const fetchSites = () => {
+  let url = 'http://localhost:4000/api/site-hebergement';
+  const params = new URLSearchParams();
+
+  if (selectedRegion) params.append('region', selectedRegion);
+  if (selectedDistrict) params.append('district', selectedDistrict);
+  if (selectedCommune) params.append('commune', selectedCommune);
+  if (selectedFokontany) params.append('fokontany', selectedFokontany);
+
+  axios
+    .get(`${url}?${params.toString()}`)
+    .then((response) => {
+      console.log("📢 Sites mis à jour :", response.data);
+      setSites(response.data);
+    })
+    .catch((error) => console.error('❌ Erreur API Sites:', error));
+};
+
 
   // ✅ Fonction pour ouvrir la popup d'ajout de site
   const handleOpenSitePopup = () => {
@@ -186,6 +179,14 @@ const [selectedSite, setSelectedSite] = useState(null); // Site sélectionné po
     setSelectedSitesites(site); // Stocke les données du site sélectionné
     setIsSitePopupOpen(true); // Ouvre la popup
   };
+ 
+  
+// ✅ Rafraîchir la liste après fermeture de la popup d'ajout/modification
+useEffect(() => {
+  if (!isSitePopupOpen) {
+    fetchSites();
+  }
+}, [isSitePopupOpen]);
 
   // ✅ Fonction pour ouvrir la popup de confirmation de suppression
   const handleOpenDeletePopup = () => {
@@ -209,33 +210,40 @@ const [selectedSite, setSelectedSite] = useState(null); // Site sélectionné po
     setIsDeleteOpen(false); // 🔥 Ferme la popup
   };
 
-  // ✅ Fonction pour supprimer un site
- // ✅ Suppression d'un site
- const handleDeleteSite = async () => {
+
+// ✅ Suppression d'un site avec mise à jour automatique
+const handleDeleteSite = async () => {
   if (!selectedSiteToDelete) return;
 
   try {
+    setIsDeleting(true);
+
     await axios.delete(`http://localhost:4000/api/site-hebergement/${selectedSiteToDelete.id_site}`);
-    setSites(prev => prev.filter(site => site.id_site !== selectedSiteToDelete.id_site));
+
     toast({
       title: '✅ Site supprimé avec succès',
       status: 'success',
       duration: 3000,
       isClosable: true,
     });
+
+    fetchSites();
   } catch (error) {
     toast({
-      title: '❌ Erreur lors de la suppression',
-      description: error.response?.data?.message || 'Une erreur est survenue',
+      title: '❌ Suppression échouée',
+      description: error.response?.data?.message || 'Erreur serveur, veuillez réessayer.',
       status: 'error',
       duration: 3000,
       isClosable: true,
     });
+  } finally {
+    setIsDeleting(false);
+    setIsDeleteOpen(false);
+    setSelectedSiteToDelete(null);
   }
+}; // ✅ Assure-toi que cette accolade ferme uniquement `handleDeleteSite`
 
-  setIsDeleteOpen(false);
-  setSelectedSiteToDelete(null);
-};
+
 
   // ✅ Fonction pour cocher/décocher un suivi
   const toggleRowSelection = (siteId) => {
@@ -246,7 +254,7 @@ const [selectedSite, setSelectedSite] = useState(null); // Site sélectionné po
     );
   };
 
-  const columnHelper = createColumnHelper();
+ 
 
   const columns = [
     {
@@ -274,23 +282,23 @@ const [selectedSite, setSelectedSite] = useState(null); // Site sélectionné po
     },
     columnHelper.accessor('nom_site', {
       id: 'nom_site',
-      header: () => <Text color="gray.400">Nom du Site</Text>,
-      cell: (info) => <Text fontWeight="700">{String(info.getValue())}</Text>,
+      header: 'Nom du Site',
+      cell: (info) => info.getValue(),
     }),
     columnHelper.accessor('capacite', {
       id: 'capacite',
-      header: () => <Text color="gray.400">Capacité</Text>,
-      cell: (info) => <Text fontWeight="700">{Number(info.getValue())}</Text>,
+      header: 'Capacité',
+      cell: (info) => info.getValue(),
     }),
     columnHelper.accessor('nom_type', {
       id: 'nom_type',
-      header: () => <Text color="gray.400">Type de Site</Text>,
-      cell: (info) => <Text fontWeight="700">{String(info.getValue())}</Text>,
+      header: 'Type de Site',
+      cell: (info) => info.getValue(),
     }),
   ];
 
   const table = useReactTable({
-    data: sites, // ✅ Maintenant, on affiche les sites
+    data: sites,
     columns,
     state: { sorting },
     onSortingChange: setSorting,
@@ -378,72 +386,70 @@ const [selectedSite, setSelectedSite] = useState(null); // Site sélectionné po
       {/* Conteneur des sélections bien réparti */}
       <Flex align="center" wrap="wrap" justify="space-between" px="25px">
         <Flex direction="column" gap="10px">
-          <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedRegion} onChange={handleRegionChange}>
-            <option value="">Sélectionner une région</option>
-            {regions.map((region, index) => <option key={index} value={region}>{region}</option>)}
-          </Select>
+        <Select value={selectedRegion} onChange={handleRegionChange}>
+          <option value="">Sélectionner une région</option>
+          {locations.regions.map((region, index) => <option key={index} value={region}>{region}</option>)}
+        </Select>
 
-          <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedDistrict} onChange={handleDistrictChange} disabled={!selectedRegion}>
-            <option value="">Sélectionner un district</option>
-            {districts.map((district, index) => <option key={index} value={district}>{district}</option>)}
-          </Select>
+          <Select value={selectedDistrict} onChange={handleDistrictChange} disabled={!selectedRegion}>
+          <option value="">Sélectionner un district</option>
+          {locations.districts.map((district, index) => <option key={index} value={district}>{district}</option>)}
+        </Select>
         </Flex>
 
         <Flex direction="column" gap="10px">
-          <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedCommune} onChange={handleCommuneChange} disabled={!selectedDistrict}>
-            <option value="">Sélectionner une commune</option>
-            {communes.map((commune, index) => <option key={index} value={commune}>{commune}</option>)}
-          </Select>
+        <Select value={selectedCommune} onChange={handleCommuneChange} disabled={!selectedDistrict}>
+          <option value="">Sélectionner une commune</option>
+          {locations.communes.map((commune, index) => <option key={index} value={commune}>{commune}</option>)}
+        </Select>
 
-          <Select fontSize="sm" variant="subtle" fontWeight="700" value={selectedFokontany} onChange={handleFokontanyChange} disabled={!selectedCommune}>
-            <option value="">Sélectionner un fokontany</option>
-            {fokontanys.map((fokontany, index) => <option key={index} value={fokontany}>{fokontany}</option>)}
-          </Select>
+        <Select value={selectedFokontany} onChange={handleFokontanyChange} disabled={!selectedCommune}>
+          <option value="">Sélectionner un fokontany</option>
+          {locations.fokontanys.map((fokontany, index) => <option key={index} value={fokontany}>{fokontany}</option>)}
+        </Select>
         </Flex>
       </Flex>
 
       {/* Conteneur avec scroll horizontal */}
       <Box overflowX="auto">
-        <Table
-          variant="simple"
-          color="gray.500"
-          mb="24px"
-          mt="12px"
-          minWidth="600px"
-        >
-          <Thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <Th key={header.id} borderColor={borderColor}>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
-                  </Th>
-                ))}
-              </Tr>
-            ))}
-          </Thead>
-          <Tbody>
-            {table
-              .getRowModel()
-              .rows.slice(pageIndex, pageIndex + rowsPerPage)
-              .map((row) => (
-                <Tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Td key={cell.id} borderColor="transparent">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </Td>
-                  ))}
-                </Tr>
+  <Table variant="simple" color="gray.500" mb="24px" mt="12px" minWidth="600px">
+    <Thead>
+      {table.getHeaderGroups().map((headerGroup) => (
+        <Tr key={headerGroup.id}>
+          {headerGroup.headers.map((header) => (
+            <Th key={header.id} textAlign="left">
+              {flexRender(header.column.columnDef.header, header.getContext())}
+            </Th>
+          ))}
+        </Tr>
+      ))}
+    </Thead>
+    <Tbody>
+      {table.getRowModel().rows.length > 0 ? (
+        table
+          .getRowModel()
+          .rows.slice(pageIndex * rowsPerPage, (pageIndex + 1) * rowsPerPage)
+          .map((row) => (
+            <Tr key={row.id}>
+              {row.getVisibleCells().map((cell) => (
+                <Td key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </Td>
               ))}
-          </Tbody>
-        </Table>
-      </Box>
+            </Tr>
+          ))
+      ) : (
+        <Tr>
+          <Td colSpan={table.getHeaderGroups()[0]?.headers.length} textAlign="center" py="10">
+            <Text color="gray.400" fontSize="md">Aucune donnée disponible</Text>
+          </Td>
+        </Tr>
+      )}
+    </Tbody>
+  </Table>
+</Box>
+
+
 
       {/* Pagination */}
       <Flex justifyContent="center" mt="10px" gap="20px">

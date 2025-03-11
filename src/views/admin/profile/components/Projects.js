@@ -17,6 +17,13 @@ import {
   useColorModeValue,
   Select,
   useToast,
+  Checkbox,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
 } from '@chakra-ui/react';
 
 // ✅ Import de TanStack Table (gestion des tableaux)
@@ -27,57 +34,45 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+
 // ✅ Import des hooks React
 import { useEffect, useState, useRef } from 'react';
-import { Checkbox } from "@chakra-ui/react";
-import { AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from "@chakra-ui/react";
-
-// ✅ Import d'Axios pour les appels API
 import axios from 'axios';
-import Card from 'components/card/Card'; // Composant pour l'affichage sous forme de carte
-
-// ✅ Import de la popup d'ajout/modification de suivi
+import Card from 'components/card/Card';
 import ProjectsAjoutPopup from "views/admin/profile/components/ProjectsAjoutPopup";
 
 const columnHelper = createColumnHelper();
 
 export default function SuiviSiteTable() {
-  // ✅ Notification pour afficher les erreurs et succès
+
   const toast = useToast();
-  // ✅ États pour stocker les données récupérées de l'API
-  const [data, setData] = useState([]); // 🔥 Stocke les suivis des sites d'hébergement
-  const [sorting, setSorting] = useState([]); // 🔥 Gère le tri des colonnes
-
-  // ✅ États pour gérer la sélection des lignes
-  const [selectedRows, setSelectedRows] = useState([]); // 🔥 Stocke les ID des suivis cochés
-
-  // ✅ Style pour le mode clair/sombre
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
 
-  // ✅ États pour la gestion des filtres (Région, Commune, Fokontany, Site)
-  const [regions, setRegions] = useState([]); // 🔥 Liste des régions disponibles
-  const [communes, setCommunes] = useState([]); // 🔥 Liste des communes en fonction de la région sélectionnée
-  const [fokontanys, setFokontanys] = useState([]); // 🔥 Liste des fokontanys en fonction de la commune sélectionnée
-  const [sites, setSites] = useState([]); // 🔥 Liste des sites d'hébergement disponibles
+  const [data, setData] = useState([]);
+  const [sorting, setSorting] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [regions, setRegions] = useState([]);
+  const [communes, setCommunes] = useState([]);
+  const [fokontanys, setFokontanys] = useState([]);
+  const [sites, setSites] = useState([]);
 
-  // ✅ On sélectionne par défaut la région, la commune et le fokontany BETIOKY CENTRE (id: 8469)
-  const [selectedRegion, setSelectedRegion] = useState("ATSIMO ANDREFANA"); // Région avec des suivis
-  const [selectedCommune, setSelectedCommune] = useState(""); // Sélectionnera une commune plus tard
-  const [selectedFokontany, setSelectedFokontany] = useState(""); // Sélectionnera un fokontany plus tard
-  const [selectedSite, setSelectedSite] = useState(""); // Sélectionnera un site plus tard
+  const [selectedRegion, setSelectedRegion] = useState(localStorage.getItem("selectedRegion") || "ATSIMO ANDREFANA");
+  const [selectedCommune, setSelectedCommune] = useState(localStorage.getItem("selectedCommune") || "");
+  const [selectedFokontany, setSelectedFokontany] = useState(localStorage.getItem("selectedFokontany") || "");
+  const [selectedSite, setSelectedSite] = useState(localStorage.getItem("selectedSite") || "");
 
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false); // 🔥 Gère l'affichage de la popup
-  const cancelRef = useRef(); // Référence pour le bouton "Annuler"
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const cancelRef = useRef();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [selectedSuivi, setSelectedSuivi] = useState(null);
 
-  // ✅ États pour la gestion de la popup d'ajout/modification
-  const [isPopupOpen, setIsPopupOpen] = useState(false); // 🔥 Contrôle l'ouverture de la popup
-  const [selectedSuivi, setSelectedSuivi] = useState(null); // 🔥 Stocke les données du suivi sélectionné pour modification
+  const [pageIndex, setPageIndex] = useState(parseInt(localStorage.getItem("pageIndex")) || 0);
+  const rowsPerPage = 15;
 
-  // ✅ États pour la pagination de la table
-  const [pageIndex, setPageIndex] = useState(0); // 🔥 Page actuelle
-  const rowsPerPage = 15; // 🔥 Nombre de lignes affichées par page
-
+  const [refreshKey, setRefreshKey] = useState(0);
+  
+  
   // ✅ Récupérer les données des suivis des sites d'hébergement
   useEffect(() => {
     axios
@@ -102,6 +97,20 @@ export default function SuiviSiteTable() {
         setRegions([]);
       });
   }, []);
+
+   // ✅ Recharger les données après une modification
+   useEffect(() => {
+    let url = 'http://localhost:4000/api/suivi-site-hebergement-full';
+    const params = new URLSearchParams();
+
+    params.append('region', selectedRegion);
+    params.append('commune', selectedCommune);
+    params.append('fokontany', selectedFokontany);
+
+    axios.get(`${url}?${params.toString()}`)
+      .then((response) => setData(response.data))
+      .catch((error) => console.error('❌ Erreur API :', error));
+  }, [selectedRegion, selectedCommune, selectedFokontany, refreshKey]);
 
 
 
@@ -193,43 +202,38 @@ export default function SuiviSiteTable() {
     }
   }, [selectedRegion, selectedCommune, selectedFokontany]); // 🔥 Se met à jour uniquement quand ces valeurs changent
 
-  // ✅ Gestion des filtres
-  // ✅ Mettre à jour la région sélectionnée et réinitialiser les autres filtres
+  
+  // ✅ Gestion des filtres (stockage dans localStorage)
   const handleRegionChange = (e) => {
     const region = e.target.value;
     setSelectedRegion(region);
     setSelectedCommune('');
     setSelectedFokontany('');
     setSelectedSite('');
-
-    // 🔥 Sauvegarde dans localStorage pour garder la sélection
     localStorage.setItem('selectedRegion', region);
-    localStorage.removeItem('selectedCommune');
-    localStorage.removeItem('selectedFokontany');
-    localStorage.removeItem('selectedSite');
   };
 
-  // ✅ Mettre à jour la commune sélectionnée et réinitialiser les fokontany et sites
   const handleCommuneChange = (e) => {
     const commune = e.target.value;
     setSelectedCommune(commune);
     setSelectedFokontany('');
     setSelectedSite('');
-
     localStorage.setItem('selectedCommune', commune);
-    localStorage.removeItem('selectedFokontany');
-    localStorage.removeItem('selectedSite');
   };
 
-  // ✅ Mettre à jour le fokontany sélectionné et réinitialiser les sites
   const handleFokontanyChange = (e) => {
     const fokontany = e.target.value;
     setSelectedFokontany(fokontany);
     setSelectedSite('');
-
     localStorage.setItem('selectedFokontany', fokontany);
-    localStorage.removeItem('selectedSite');
   };
+
+  const handleSiteChange = (e) => {
+    const site = e.target.value;
+    setSelectedSite(site);
+    localStorage.setItem('selectedSite', site);
+  };
+
 
   // ✅ Fonction pour ouvrir la popup en mode "Ajout"
   const handleOpenPopupForAdd = () => {
@@ -259,32 +263,18 @@ export default function SuiviSiteTable() {
     setIsDeleteOpen(false); // 🔥 Ferme la popup
   };
 
-  const handleDeleteSuivis = async () => {
-    setIsDeleteOpen(false); // Ferme la popup après confirmation
-
+   // ✅ Gestion de la suppression
+   const handleDeleteSuivis = async () => {
+    setIsDeleteOpen(false);
     try {
-      const response = await axios.delete("http://localhost:4000/api/suivi-site-hebergement-full", {
-        data: { ids: selectedRows }, // 🔥 On envoie les ID des suivis à supprimer
+      await axios.delete("http://localhost:4000/api/suivi-site-hebergement-full", {
+        data: { ids: selectedRows },
       });
-
-      if (response.data.success) {
-        setData((prevData) => prevData.filter((row) => !selectedRows.includes(row.id)));
-        setSelectedRows([]);
-      } else {
-        alert("Erreur lors de la suppression.");
-      }
+      setSelectedRows([]);
+      setRefreshKey((prev) => prev + 1); // 🔥 Actualiser la table
     } catch (error) {
       console.error("❌ Erreur lors de la suppression :", error);
     }
-  };
-
-
-  // ✅ Mettre à jour le site sélectionné
-  const handleSiteChange = (e) => {
-    const site = e.target.value;
-    setSelectedSite(site);
-
-    localStorage.setItem('selectedSite', site);
   };
 
   // ✅ Fonction pour cocher/décocher un suivi
@@ -354,16 +344,22 @@ export default function SuiviSiteTable() {
     getSortedRowModel: getSortedRowModel(),
   });
 
-  // 🔥 Gestion des flèches de navigation
+  // ✅ Gestion de la pagination (stockage dans localStorage)
   const nextPage = () => {
     if (pageIndex + rowsPerPage < data.length) {
-      setPageIndex(pageIndex + rowsPerPage);
+      setPageIndex((prev) => {
+        localStorage.setItem("pageIndex", prev + rowsPerPage);
+        return prev + rowsPerPage;
+      });
     }
   };
 
   const prevPage = () => {
     if (pageIndex > 0) {
-      setPageIndex(pageIndex - rowsPerPage);
+      setPageIndex((prev) => {
+        localStorage.setItem("pageIndex", prev - rowsPerPage);
+        return prev - rowsPerPage;
+      });
     }
   };
 
