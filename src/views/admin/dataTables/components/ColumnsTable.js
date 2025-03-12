@@ -1,3 +1,4 @@
+// frontend/src/views/admin/dataTables/components/ColumnsTable.js
 /* eslint-disable */
 
 import {

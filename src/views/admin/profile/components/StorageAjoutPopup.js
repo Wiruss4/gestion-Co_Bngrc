@@ -1,3 +1,5 @@
+// frontend/src/views/admin/profile/components/Upload.js
+
 import { useState, useEffect } from "react";
 import { 
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, 

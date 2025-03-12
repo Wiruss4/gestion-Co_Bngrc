@@ -1,3 +1,5 @@
+// frontend/src/views/admin/dataTables/index.jsx
+
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import DevelopmentTable from "views/admin/dataTables/components/DevelopmentTable";
 import CheckTable from "views/admin/dataTables/components/CheckTable";
