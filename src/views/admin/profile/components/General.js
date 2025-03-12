@@ -1,11 +1,15 @@
+// frontend/src/views/admin/profile/components/General.js
+
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Flex, Table, Thead, Tbody, Tr, Th, Td,
+  Box, Flex, Table, Thead, Tbody, Tr, Th, Td, ButtonGroup,
   Button, Select, useToast, useColorModeValue,
   VStack, HStack, Heading, Divider
 } from '@chakra-ui/react';
 import axios from 'axios';
 import GeneralAjoutPopup from './GeneralAjoutPopup';
+
+import Card from 'components/card/Card';
 
 export default function General() {
   const toast = useToast();
@@ -127,97 +131,156 @@ export default function General() {
   };
 
   return (
-    <Box p="25px">
-      <Flex direction={{ base: "column", md: "row" }} gap="20px">
+    <Card w="100%" px="0px">
+      <Flex direction={{ base: "column", md: "row" }} gap="20px" p="2px">
         {/* COLONNE GAUCHE : Secteurs & Sous-secteurs */}
-        <Box flex="1" borderRadius="lg" bg="white" p="6" shadow="md">
+        <Card flex="1" borderRadius="lg" p="6">
           <VStack spacing="4" align="stretch">
-            <Heading size="md" mb="4">Gestion des Secteurs</Heading>
-            <Button colorScheme="green" onClick={() => openPopup('secteur')}>
-              Ajouter Secteur
-            </Button>
-            <Table variant="simple" mt="4">
-              <Thead>
-                <Tr>
-                  <Th>Secteur</Th>
-                  <Th>Actions</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {secteurs.map((secteur) => (
-                  <Tr key={secteur.id_secteur}>
-                    <Td>{secteur.nom_secteur}</Td>
-                    <Td>
-                      <HStack spacing="2">
-                        <Button size="sm" colorScheme="blue" onClick={() => openPopup('secteur', secteur.id_secteur)}>
-                          Modifier
-                        </Button>
-                        <Button size="sm" colorScheme="red" onClick={() => handleDelete(secteur.id_secteur, "secteur")}>
-                          Supprimer
-                        </Button>
-                      </HStack>
-                    </Td>
+            {/* En-tête Secteurs */}
+            <Flex justifyContent="space-between" align="center" mb="4">
+              <Heading size="md">Gestion des Secteurs</Heading>
+              <Button
+                variant="brand"
+                w="140px"
+                minW="140px"
+                onClick={() => openPopup('secteur')}
+              >
+                Ajouter Secteur
+              </Button>
+            </Flex>
+
+            <Box>
+              <Table variant="simple" width="100%">
+                <Thead>
+                  <Tr>
+                    <Th borderColor="gray.200">Secteur</Th>
+                    <Th borderColor="gray.200">Actions</Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                </Thead>
+                <Tbody>
+                  {secteurs.map((secteur) => (
+                    <Tr key={secteur.id_secteur}>
+                      <Td borderColor="transparent">{secteur.nom_secteur}</Td>
+                      <Td borderColor="transparent">
+                        <HStack spacing="2">
+                          <Button
+                            size="sm"
+                            variant="brand"
+                            onClick={() => openPopup('secteur', secteur.id_secteur)}
+                          >
+                            Modifier
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="brand"
+                            colorScheme="red"
+                            onClick={() => handleDelete(secteur.id_secteur, "secteur")}
+                          >
+                            Supprimer
+                          </Button>
+                        </HStack>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </Box>
 
             <Divider my="4" />
-            
-            <Heading size="md" mb="4">Gestion des Sous-secteurs</Heading>
-            <Select 
-              placeholder="Sélectionner un secteur" 
-              onChange={e => setSelectedSecteur(e.target.value)}
-            >
-              {secteurs.map(secteur => (
-                <option key={secteur.id_secteur} value={secteur.id_secteur}>
-                  {secteur.nom_secteur}
-                </option>
-              ))}
-            </Select>
 
-            {selectedSecteur && (
-              <VStack spacing="4" align="stretch">
-                <Button colorScheme="green" onClick={() => openPopup('sous_secteur')}>
-                  Ajouter Sous-Secteur
-                </Button>
-                <Table variant="simple">
-                  <Thead>
-                    <Tr>
-                      <Th>Sous-Secteur</Th>
-                      <Th>Actions</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {sousSecteurs.map(ss => (
-                      <Tr key={ss.id_sous_secteur}>
-                        <Td>{ss.nom_sous_secteur}</Td>
-                        <Td>
-                          <HStack spacing="2">
-                            <Button size="sm" colorScheme="blue" onClick={() => openPopup('sous_secteur', ss.id_sous_secteur)}>
-                              Modifier
-                            </Button>
-                            <Button size="sm" colorScheme="red" onClick={() => handleDelete(ss.id_sous_secteur, "sous_secteur")}>
-                              Supprimer
-                            </Button>
-                          </HStack>
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </VStack>
-            )}
+            {/* En-tête Sous-secteurs */}
+            <Flex direction="column" gap="10px">
+              <Heading size="md" mb="2">Gestion des Sous-secteurs</Heading>
+
+              <Select
+                variant="subtle"
+                fontWeight="700"
+                color="black"
+                placeholder="Sélectionner un secteur"
+                onChange={e => setSelectedSecteur(e.target.value)}
+              >
+                {secteurs.map(secteur => (
+                  <option key={secteur.id_secteur} value={secteur.id_secteur}>
+                    {secteur.nom_secteur}
+                  </option>
+                ))}
+              </Select>
+
+              {selectedSecteur && (
+                <VStack spacing="4" align="stretch">
+                  <Flex justify="flex-end">
+                    <Button
+                      variant="brand"
+                      w="160px"
+                      minW="160px"
+                      onClick={() => openPopup('sous_secteur')}
+                    >
+                      Add Sous-Secteur
+                    </Button>
+                  </Flex>
+
+                  <Box>
+                    <Table variant="simple" width="100%">
+                      <Thead>
+                        <Tr>
+                          <Th borderColor="gray.200">Sous-Secteur</Th>
+                          <Th borderColor="gray.200">Actions</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {sousSecteurs.map(ss => (
+                          <Tr key={ss.id_sous_secteur}>
+                            <Td borderColor="transparent">{ss.nom_sous_secteur}</Td>
+                            <Td borderColor="transparent">
+                              <HStack spacing="2">
+                                <Button
+                                  size="sm"
+                                  variant="brand"
+                                  onClick={() => openPopup('sous_secteur', ss.id_sous_secteur)}
+                                >
+                                  Modifier
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="brand"
+                                  colorScheme="red"
+                                  onClick={() => handleDelete(ss.id_sous_secteur, "sous_secteur")}
+                                >
+                                  Supprimer
+                                </Button>
+                              </HStack>
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </Box>
+                </VStack>
+              )}
+            </Flex>
           </VStack>
-        </Box>
+        </Card>
 
         {/* COLONNE DROITE : Gestion des Types de Besoins */}
-        <Box flex="1" borderRadius="lg" bg="white" p="6" shadow="md">
+        <Card flex="1" borderRadius="lg" p="6">
           <VStack spacing="4" align="stretch">
-            <Heading size="md" mb="4">Gestion des Types de Besoins</Heading>
-            
-            <VStack spacing="4" align="stretch">
+            <Flex justifyContent="space-between" align="center" mb="4">
+              <Heading size="md">Gestion des Types de Besoins</Heading>
+              <Button
+                variant="brand"
+                w="160px"
+                minW="160px"
+                onClick={() => openPopup('type_besoin')}
+              >
+                Ajouter Type
+              </Button>
+            </Flex>
+
+            <Flex direction="column" gap="10px">
               <Select
+                variant="subtle"
+                fontWeight="700"
+                color="black"
                 placeholder="Sélectionner une nature"
                 onChange={e => setSelectedNatureRight(e.target.value)}
               >
@@ -229,6 +292,9 @@ export default function General() {
               </Select>
 
               <Select
+                variant="subtle"
+                fontWeight="700"
+                color="black"
                 placeholder="Sélectionner un secteur"
                 onChange={e => setSelectedSecteurRight(e.target.value)}
               >
@@ -240,6 +306,9 @@ export default function General() {
               </Select>
 
               <Select
+                variant="subtle"
+                fontWeight="700"
+                color="black"
                 placeholder="Sélectionner un sous-secteur"
                 onChange={e => setSelectedSousSecteurRight(e.target.value)}
               >
@@ -250,38 +319,45 @@ export default function General() {
                 ))}
               </Select>
 
-              <Button colorScheme="green" onClick={() => openPopup('type_besoin')}>
-                Ajouter Type de Besoin
-              </Button>
-
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Type de Besoin</Th>
-                    <Th>Actions</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {types.map(type => (
-                    <Tr key={type.id_type}>
-                      <Td>{type.nom_type}</Td>
-                      <Td>
-                        <HStack spacing="2">
-                          <Button size="sm" colorScheme="blue" onClick={() => openPopup('type_besoin', type.id_type)}>
-                            Modifier
-                          </Button>
-                          <Button size="sm" colorScheme="red" onClick={() => handleDelete(type.id_type, "type_besoin")}>
-                            Supprimer
-                          </Button>
-                        </HStack>
-                      </Td>
+              <Box>
+                <Table variant="simple" width="100%">
+                  <Thead>
+                    <Tr>
+                      <Th borderColor="gray.200">Type de Besoin</Th>
+                      <Th borderColor="gray.200">Actions</Th>
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </VStack>
+                  </Thead>
+                  <Tbody>
+                    {types.map(type => (
+                      <Tr key={type.id_type}>
+                        <Td borderColor="transparent">{type.nom_type}</Td>
+                        <Td borderColor="transparent">
+                          <HStack spacing="2">
+                            <Button
+                              size="sm"
+                              variant="brand"
+                              onClick={() => openPopup('type_besoin', type.id_type)}
+                            >
+                              Modifier
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="brand"
+                              colorScheme="red"
+                              onClick={() => handleDelete(type.id_type, "type_besoin")}
+                            >
+                              Supprimer
+                            </Button>
+                          </HStack>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Box>
+            </Flex>
           </VStack>
-        </Box>
+        </Card>
       </Flex>
 
       <GeneralAjoutPopup
@@ -300,6 +376,6 @@ export default function General() {
         selectedNatureRight={selectedNatureRight}
         selectedSousSecteurRight={selectedSousSecteurRight}
       />
-    </Box>
-  );
+    </Card>
+);
 }

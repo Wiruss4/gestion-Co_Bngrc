@@ -60,92 +60,101 @@ const GeneralAjoutPopup = ({
     }
   }, [id, type]);
 
- // In GeneralAjoutPopup.js, update the handleSubmit function:
+  const handleSubmit = () => {
+    if (!nom) {
+      toast({
+        title: "Erreur",
+        description: `Le nom du ${type} est requis.`,
+        status: "error",
+        duration: 3000
+      });
+      return;
+    }
 
-const handleSubmit = () => {
-  if (!nom) {
-    toast({
-      title: "Erreur",
-      description: `Le nom du ${type} est requis.`,
-      status: "error",
-      duration: 3000
-    });
-    return;
-  }
+    let url = '';
+    if (type === "type_besoin") {
+      url = `http://localhost:4000/api/types-besoin${id ? `/${id}` : ""}`;
+    } else if (type === "sous_secteur") {
+      url = `http://localhost:4000/api/sous-secteurs${id ? `/${id}` : ""}`;
+    } else {
+      url = `http://localhost:4000/api/${type}s${id ? `/${id}` : ""}`;
+    }
 
-  let url = '';
-  let data = {};
+    const method = id ? "put" : "post";
+    let data = {};
 
-  if (type === "type_besoin") {
-    url = `http://localhost:4000/api/types-besoin${id ? `/${id}` : ""}`;
+    if (type === "secteur" || type === "sous_secteur") {
+      data = { nom };
+      if (type === "sous_secteur") {
+        if (!selectedSecteur) {
+          toast({
+            title: "Erreur",
+            description: "Veuillez sélectionner un secteur pour le sous‑secteur.",
+            status: "error",
+            duration: 3000
+          });
+          return;
+        }
+        data.id_secteur = selectedSecteur;
+      }
+    } else if (type === "type_besoin") {
+      // Vérifier que les valeurs de nature et de sous-secteur existent
+      if (!selectedNatureRight || !selectedSousSecteurRight) {
+        toast({
+          title: "Erreur",
+          description: "Veuillez sélectionner une nature et un sous‑secteur.",
+          status: "error",
+          duration: 3000
+        });
+        return;
+      }
+      data = {
+        id_nature: selectedNatureRight,
+        id_sous_secteur: selectedSousSecteurRight,
+        nom_type: nom
+      };
+    }
     
-    // Vérification des valeurs requises
-    if (!selectedNatureRight || !selectedSousSecteurRight) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner une nature et un sous-secteur.",
-        status: "error",
-        duration: 3000
-      });
-      return;
-    }
-
-    data = {
-      nom_type: nom,
+    console.log("🔍 Données envoyées pour type_besoin :", {
       id_nature: selectedNatureRight,
-      id_sous_secteur: selectedSousSecteurRight
-    };
-  } else if (type === "sous_secteur") {
-    url = `http://localhost:4000/api/sous-secteurs${id ? `/${id}` : ""}`;
-    if (!selectedSecteur) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner un secteur.",
-        status: "error",
-        duration: 3000
-      });
-      return;
-    }
-    data = {
-      nom: nom,
-      id_secteur: selectedSecteur
-    };
-  } else {
-    url = `http://localhost:4000/api/${type}s${id ? `/${id}` : ""}`;
-    data = { nom };
-  }
-
-  const method = id ? "put" : "post";
-
-  console.log("Sending data:", data);  // Debug log
-
-  axios({
-    method,
-    url,
-    data,
-    headers: { "Content-Type": "application/json" }
-  })
-    .then(() => {
-      toast({
-        title: "Succès",
-        description: id ? `${type} modifié.` : `${type} ajouté.`,
-        status: "success",
-        duration: 3000
-      });
-      if (fetchTypes) fetchTypes();
-      onClose();
-    })
-    .catch(err => {
-      console.error("Erreur lors de l'enregistrement :", err);
-      toast({
-        title: "Erreur",
-        description: `Impossible d'enregistrer le ${type}.`,
-        status: "error",
-        duration: 3000
-      });
+      id_sous_secteur: selectedSousSecteurRight,
+      nom_type: nom
     });
-};
+    
 
+    axios({
+      method,
+      url,
+      data,
+      headers: { "Content-Type": "application/json" }
+    })
+      .then(() => {
+        toast({
+          title: "Succès",
+          description: id ? `${type} modifié.` : `${type} ajouté.`,
+          status: "success",
+          duration: 3000
+        });
+        // Appel de la fonction de rafraîchissement selon le type
+        if (type === "secteur" && fetchSecteurs) {
+          fetchSecteurs();
+        } else if (type === "sous_secteur" && fetchSousSecteurs) {
+          fetchSousSecteurs();
+        } else if (type === "type_besoin" && fetchTypes) {
+          fetchTypes();
+        }
+        onClose();
+      })
+      .catch(err => {
+        console.error("Erreur lors de l'enregistrement :", err);
+        toast({
+          title: "Erreur",
+          description: `Impossible d'enregistrer ${type}.`,
+          status: "error",
+          duration: 3000
+        });
+      });
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -156,7 +165,17 @@ const handleSubmit = () => {
         <ModalBody>
           <FormControl>
             <FormLabel>Nom</FormLabel>
-            <Input value={nom} onChange={(e) => setNom(e.target.value)} />
+            <Input 
+              value={nom} 
+              onChange={(e) => setNom(e.target.value)}
+              bg="gray.300"
+              borderColor="gray.200"
+              _hover={{ borderColor: "gray.300" }}
+              _focusVisible={{
+                borderColor: "brand.500",
+                boxShadow: "0 0 0 1px brand.500"
+              }}
+            />
           </FormControl>
           <Button colorScheme="blue" mt={4} onClick={handleSubmit}>
             Valider
