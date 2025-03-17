@@ -81,7 +81,12 @@ const UploadAjoutPopup = ({ isOpen, onClose, idSite }) => {
 
           <FormControl mb={4}>
             <FormLabel>Quantité</FormLabel>
-            <Input type="number" value={quantite} min="1" onChange={(e) => setQuantite(parseInt(e.target.value))} />
+            <Input
+              type="number"
+              color={'black'}
+              value={quantite}
+              min="1"
+              onChange={(e) => setQuantite(parseInt(e.target.value))} />
           </FormControl>
 
           <Button colorScheme="blue" onClick={handleSubmit}>Ajouter</Button>

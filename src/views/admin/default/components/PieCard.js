@@ -1,4 +1,5 @@
-// Chakra imports
+// frontend/src/views/admin/default/components/PieCard.js
+
 import { Box, Flex, Text, Select, useColorModeValue } from "@chakra-ui/react";
 // Custom components
 import Card from "components/card/Card.js";

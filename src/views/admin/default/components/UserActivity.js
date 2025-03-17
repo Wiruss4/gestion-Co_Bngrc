@@ -1,4 +1,4 @@
-// Chakra imports
+// frontend/src/views/admin/default/components/TotalSpent.js
 import { Box, Flex, Select, Text, useColorModeValue } from "@chakra-ui/react";
 import Card from "components/card/Card.js";
 // Custom components

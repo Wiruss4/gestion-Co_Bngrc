@@ -1,4 +1,5 @@
-// Chakra imports
+// frontend/src/views/admin/default/components/Tasks.js
+
 import {
   Box,
   Flex,

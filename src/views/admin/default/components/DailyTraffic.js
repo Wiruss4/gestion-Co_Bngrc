@@ -1,3 +1,5 @@
+// frontend/src/views/admin/default/components/DailyTraffic.js
+
 import React from "react";
 
 // Chakra imports

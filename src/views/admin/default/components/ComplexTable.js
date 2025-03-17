@@ -1,4 +1,4 @@
-/* eslint-disable */
+// frontend/src/views/admin/default/components/ComplexTable.js
 
 import {
   Box,

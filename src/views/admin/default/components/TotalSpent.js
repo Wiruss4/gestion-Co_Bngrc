@@ -1,124 +1,93 @@
-// Chakra imports
+'use client';
+
+import { useState, useEffect } from 'react';
 import {
-  Box,
-  Button,
-  Flex,
-  Icon,
-  Text,
-  useColorModeValue,
-} from "@chakra-ui/react";
-// Custom components
-import Card from "components/card/Card.js";
-import LineChart from "components/charts/LineChart";
-import React from "react";
-import { IoCheckmarkCircle } from "react-icons/io5";
-import { MdBarChart, MdOutlineCalendarToday } from "react-icons/md";
-// Assets
-import { RiArrowUpSFill } from "react-icons/ri";
-import {
-  lineChartDataTotalSpent,
-  lineChartOptionsTotalSpent,
-} from "variables/charts";
+  Box, Button, Select, useToast, useColorModeValue, Flex, Text, useDisclosure
+} from '@chakra-ui/react';
+import LineChart from 'components/charts/LineChart';
+import MiniCalendar from 'components/calendar/MiniCalendar';
+import axios from 'axios';
+import Card from 'components/card/Card';
 
-export default function TotalSpent(props) {
-  const { ...rest } = props;
+export default function TotalSpent({ selectedSite, onPointSelect }) {
+  const [type, setType] = useState('personnes');
+  const [date, setDate] = useState(new Date());
+  const [periode, setPeriode] = useState('month');
+  const [stats, setStats] = useState({ historique: [], nombre_actuel: 0, nombre_max: 0 });
+  const { isOpen, onToggle, onClose } = useDisclosure();
+  const toast = useToast();
 
-  // Chakra Color Mode
+  useEffect(() => {
+    if (selectedSite) {
+      axios.get('http://localhost:4000/api/stats/suivi-site', {
+        params: {
+          id_site: selectedSite,
+          type,
+          date: date.toISOString().slice(0, 10),
+          periode,
+        },
+      })
+        .then(res => setStats(res.data))
+        .catch(err => toast({ title: 'Erreur chargement données', status: 'error' }));
+    }
+  }, [selectedSite, type, date, periode, toast]);
 
-  const textColor = useColorModeValue("secondaryGray.900", "white");
-  const textColorSecondary = useColorModeValue("secondaryGray.600", "white");
-  const boxBg = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const iconColor = useColorModeValue("brand.500", "white");
-  const bgButton = useColorModeValue("secondaryGray.300", "whiteAlpha.100");
-  const bgHover = useColorModeValue(
-    { bg: "secondaryGray.400" },
-    { bg: "whiteAlpha.50" }
-  );
-  const bgFocus = useColorModeValue(
-    { bg: "secondaryGray.300" },
-    { bg: "whiteAlpha.100" }
-  );
+  const lineChartOptions = {
+    chart: {
+      type: 'line',
+      toolbar: { show: true },
+      events: {
+        dataPointSelection: (event, chartContext, config) => {
+          const pointDetails = stats.historique[config.dataPointIndex];
+          onPointSelect(pointDetails);
+        }
+      }
+    },
+    xaxis: {
+      categories: stats.historique.map(h => periode === 'month' ? h.date : h.heure_suivi)
+    },
+    stroke: { curve: 'smooth' },
+  };
+
   return (
-    <Card
-      justifyContent='center'
-      align='center'
-      direction='column'
-      w='100%'
-      mb='0px'
-      {...rest}>
-      <Flex justify='space-between' ps='0px' pe='20px' pt='5px'>
-        <Flex align='center' w='100%'>
-          <Button
-            bg={boxBg}
-            fontSize='sm'
-            fontWeight='500'
-            color={textColorSecondary}
-            borderRadius='7px'>
-            <Icon
-              as={MdOutlineCalendarToday}
-              color={textColorSecondary}
-              me='4px'
-            />
-            This month
-          </Button>
-          <Button
-            ms='auto'
-            align='center'
-            justifyContent='center'
-            bg={bgButton}
-            _hover={bgHover}
-            _focus={bgFocus}
-            _active={bgFocus}
-            w='37px'
-            h='37px'
-            lineHeight='100%'
-            borderRadius='10px'
-            {...rest}>
-            <Icon as={MdBarChart} color={iconColor} w='24px' h='24px' />
-          </Button>
-        </Flex>
-      </Flex>
-      <Flex w='100%' flexDirection={{ base: "column", lg: "row" }}>
-        <Flex flexDirection='column' me='20px' mt='28px'>
-          <Text
-            color={textColor}
-            fontSize='34px'
-            textAlign='start'
-            fontWeight='700'
-            lineHeight='100%'>
-            $37.5K
-          </Text>
-          <Flex align='center' mb='20px'>
-            <Text
-              color='secondaryGray.600'
-              fontSize='sm'
-              fontWeight='500'
-              mt='4px'
-              me='12px'>
-              Total Spent
-            </Text>
-            <Flex align='center'>
-              <Icon as={RiArrowUpSFill} color='green.500' me='2px' mt='2px' />
-              <Text color='green.500' fontSize='sm' fontWeight='700'>
-                +2.45%
-              </Text>
-            </Flex>
-          </Flex>
+    <Card p="20px">
+      <Flex justify="space-between" mb="20px" position="relative">
+        <Select w="150px" value={type} onChange={(e) => setType(e.target.value)}>
+          <option value="personnes">Personnes</option>
+          <option value="menages">Ménages</option>
+        </Select>
 
-          <Flex align='center'>
-            <Icon as={IoCheckmarkCircle} color='green.500' me='4px' />
-            <Text color='green.500' fontSize='md' fontWeight='700'>
-              On track
-            </Text>
-          </Flex>
-        </Flex>
-        <Box minH='260px' minW='75%' mt='auto'>
-          <LineChart
-            chartData={lineChartDataTotalSpent}
-            chartOptions={lineChartOptionsTotalSpent}
-          />
+        <Box position="relative">
+          <Button onClick={onToggle}>
+            {periode === 'month' ? 'This Month' : date.toLocaleDateString()}
+          </Button>
+
+          {isOpen && (
+            <Box position="absolute" top="100%" right={0} zIndex="999">
+              <MiniCalendar
+                selectRange={false}
+                onChange={(value) => {
+                  setDate(value);
+                  setPeriode(value instanceof Date ? 'day' : 'month');
+                  onClose();
+                }}
+              />
+            </Box>
+          )}
         </Box>
       </Flex>
+
+      <Box mt="4">
+        <Text fontSize="3xl">{stats.nombre_actuel}</Text>
+        <Text fontSize="sm" color={useColorModeValue('gray.500', 'gray.400')}>
+          Max : {stats.nombre_max}
+        </Text>
+
+        <LineChart
+          chartData={[{ name: type, data: stats.historique.map(h => h.nombre) }]}
+          chartOptions={lineChartOptions}
+        />
+      </Box>
     </Card>
   );
 }

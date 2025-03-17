@@ -1,3 +1,4 @@
+// frontend/src/views/admin/profile/variables/DataStorage.js
 import axios from "axios";
 
 // 📌 Fonction pour ajouter un site d'hébergement

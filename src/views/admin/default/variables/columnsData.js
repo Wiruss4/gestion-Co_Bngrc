@@ -1,3 +1,4 @@
+// frontend/src/views/admin/default/variables/columnsData.js
 export const columnsDataCheck = [
   {
     Header: "NAME",

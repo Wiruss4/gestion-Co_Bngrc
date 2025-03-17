@@ -1,4 +1,4 @@
-// Chakra imports
+// frontend/src/views/admin/default/components/WeeklyRevenue.js
 import {
   Box,
   Button,
