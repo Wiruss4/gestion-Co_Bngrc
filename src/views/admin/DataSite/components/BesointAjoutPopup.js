@@ -1,4 +1,4 @@
-// frontend/src/views/admin/profile/components/UploadAjoutPopup.js
+// frontend/src/views/admin/DataSite/components/UploadAjoutPopup.js
 
 import React, { useState, useEffect } from 'react';
 import {

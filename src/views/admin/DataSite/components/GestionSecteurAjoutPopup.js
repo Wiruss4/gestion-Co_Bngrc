@@ -1,4 +1,4 @@
-// frontend/src/views/admin/profile/components/GeneralAjoutPopup.js
+// frontend/src/views/admin/DataSite/components/GestionSecteurAjoutPopup.js
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -16,7 +16,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 
-const GeneralAjoutPopup = ({
+const GestionSecteurAjoutPopup = ({
   isOpen,
   onClose,
   type,
@@ -186,4 +186,4 @@ const GeneralAjoutPopup = ({
   );
 };
 
-export default GeneralAjoutPopup;
+export default GestionSecteurAjoutPopup;

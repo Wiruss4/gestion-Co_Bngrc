@@ -1,4 +1,4 @@
-// frontend/src/views/admin/profile/variables/Dataproject.js
+// frontend/src/views/admin/DataSite/variables/Dataproject.js
 import axios from "axios";
 
 // 📌 Fonction pour récupérer les suivis avec filtres (date_suivi et id_site)

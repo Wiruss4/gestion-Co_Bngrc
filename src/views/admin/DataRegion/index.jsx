@@ -1,19 +1,19 @@
-// frontend/src/views/admin/dataTables/index.jsx
+// frontend/src/views/admin/DataRegion/index.jsx
 
 import { Box, SimpleGrid } from "@chakra-ui/react";
-import DevelopmentTable from "views/admin/dataTables/components/DevelopmentTable";
-import CheckTable from "views/admin/dataTables/components/CheckTable";
-import ColumnsTable from "views/admin/dataTables/components/ColumnsTable";
-import ComplexTable from "views/admin/dataTables/components/ComplexTable";
+import DevelopmentTable from "views/admin/DataRegion/components/DevelopmentTable";
+import CheckTable from "views/admin/DataRegion/components/CheckTable";
+import ColumnsTable from "views/admin/DataRegion/components/ColumnsTable";
+import ComplexTable from "views/admin/DataRegion/components/ComplexTable";
 import {
   columnsDataDevelopment,
   columnsDataCheck,
   columnsDataColumns,
   columnsDataComplex,
-} from "views/admin/dataTables/variables/columnsData";
-import tableDataCheck from "views/admin/dataTables/variables/tableDataCheck.json";
-import tableDataColumns from "views/admin/dataTables/variables/tableDataColumns.json";
-import tableDataComplex from "views/admin/dataTables/variables/tableDataComplex.json";
+} from "views/admin/DataRegion/variables/columnsData";
+import tableDataCheck from "views/admin/DataRegion/variables/tableDataCheck.json";
+import tableDataColumns from "views/admin/DataRegion/variables/tableDataColumns.json";
+import tableDataComplex from "views/admin/DataRegion/variables/tableDataComplex.json";
 import { useEffect, useState } from "react";
 import React from "react";
 

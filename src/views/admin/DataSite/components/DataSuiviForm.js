@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Input, Select, Button, FormControl, FormLabel, useToast } from "@chakra-ui/react";
-import { fetchSiteHebergement } from "views/admin/profile/variables/Dataproject"; 
+import { fetchSiteHebergement } from "views/admin/DataSite/variables/Dataproject"; 
 
 export default function SuiviForm({ onSubmit, initialData }) {
   const toast = useToast();

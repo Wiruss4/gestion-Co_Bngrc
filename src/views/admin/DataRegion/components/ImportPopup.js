@@ -1,4 +1,4 @@
-// frontend/src/views/admin/dataTables/components/ImportPopup.js
+// frontend/src/views/admin/DataRegion/components/ImportPopup.js
 
 import React, { useState } from "react";
 import {

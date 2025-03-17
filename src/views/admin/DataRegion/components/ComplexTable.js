@@ -1,9 +1,12 @@
-// frontend/src/views/admin/dataTables/components/ColumnsTable.js
+// frontend/src/views/admin/DataRegion/components/ComplexTable.js
+
 /* eslint-disable */
 
 import {
-  Flex,
   Box,
+  Flex,
+  Icon,
+  Progress,
   Table,
   Tbody,
   Td,
@@ -13,24 +16,25 @@ import {
   Tr,
   useColorModeValue,
 } from '@chakra-ui/react';
-import * as React from 'react';
-
 import {
+  CheckCircleIcon, WarningIcon, TimeIcon, NotAllowedIcon, InfoIcon, CloseIcon,
   createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-
 // Custom components
 import Card from 'components/card/Card';
 import Menu from 'components/menu/MainMenu';
+import * as React from 'react';
+// Assets
+import { MdCancel, MdCheckCircle, MdOutlineError } from 'react-icons/md';
 
 const columnHelper = createColumnHelper();
 
 // const columns = columnsDataCheck;
-export default function ColumnTable(props) {
+export default function ComplexTable(props) {
   const { tableData } = props;
   const [sorting, setSorting] = React.useState([]);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
@@ -46,7 +50,7 @@ export default function ColumnTable(props) {
           fontSize={{ sm: '10px', lg: '12px' }}
           color="gray.400"
         >
-          NOM
+          NAME
         </Text>
       ),
       cell: (info) => (
@@ -57,8 +61,8 @@ export default function ColumnTable(props) {
         </Flex>
       ),
     }),
-    columnHelper.accessor('LASTname', {
-      id: 'LASTname',
+    columnHelper.accessor('status', {
+      id: 'status',
       header: () => (
         <Text
           justifyContent="space-between"
@@ -66,38 +70,42 @@ export default function ColumnTable(props) {
           fontSize={{ sm: '10px', lg: '12px' }}
           color="gray.400"
         >
-          PRENOM
+          STATUS
         </Text>
       ),
       cell: (info) => (
         <Flex align="center">
+          <Icon
+            w="24px"
+            h="24px"
+            me="5px"
+            color={
+              info.getValue() === 'Approved'
+                ? 'green.500'
+                : info.getValue() === 'Disable'
+                ? 'red.500'
+                : info.getValue() === 'Error'
+                ? 'orange.500'
+                : null
+            }
+            as={
+              info.getValue() === 'Approved'
+                ? MdCheckCircle
+                : info.getValue() === 'Disable'
+                ? MdCancel
+                : info.getValue() === 'Error'
+                ? MdOutlineError
+                : null
+            }
+          />
           <Text color={textColor} fontSize="sm" fontWeight="700">
             {info.getValue()}
           </Text>
         </Flex>
       ),
     }),
-
-    // columnHelper.accessor('progress', {
-    //   id: 'progress',
-    //   header: () => (
-    //     <Text
-    //       justifyContent="space-between"
-    //       align="center"
-    //       fontSize={{ sm: '10px', lg: '12px' }}
-    //       color="gray.400"
-    //     >
-    //       PROGRESS
-    //     </Text>
-    //   ),
-    //   cell: (info) => (
-    //     <Text color={textColor} fontSize="sm" fontWeight="700">
-    //       {info.getValue()}
-    //     </Text>
-    //   ),
-    // }),
-    columnHelper.accessor('quantity', {
-      id: 'quantity',
+    columnHelper.accessor('date', {
+      id: 'date',
       header: () => (
         <Text
           justifyContent="space-between"
@@ -105,7 +113,7 @@ export default function ColumnTable(props) {
           fontSize={{ sm: '10px', lg: '12px' }}
           color="gray.400"
         >
-          CONTACT
+          DATE
         </Text>
       ),
       cell: (info) => (
@@ -114,24 +122,30 @@ export default function ColumnTable(props) {
         </Text>
       ),
     }),
-    // columnHelper.accessor('date', {
-    //   id: 'date',
-    //   header: () => (
-    //     <Text
-    //       justifyContent="space-between"
-    //       align="center"
-    //       fontSize={{ sm: '10px', lg: '12px' }}
-    //       color="gray.400"
-    //     >
-    //       DATE
-    //     </Text>
-    //   ),
-    //   cell: (info) => (
-    //     <Text color={textColor} fontSize="sm" fontWeight="700">
-    //       {info.getValue()}
-    //     </Text>
-    //   ),
-    // }),
+    columnHelper.accessor('progress', {
+      id: 'progress',
+      header: () => (
+        <Text
+          justifyContent="space-between"
+          align="center"
+          fontSize={{ sm: '10px', lg: '12px' }}
+          color="gray.400"
+        >
+          PROGRESS
+        </Text>
+      ),
+      cell: (info) => (
+        <Flex align="center">
+          <Progress
+            variant="table"
+            colorScheme="brandScheme"
+            h="8px"
+            w="108px"
+            value={info.getValue()}
+          />
+        </Flex>
+      ),
+    }),
   ];
   const [data, setData] = React.useState(() => [...defaultData]);
   const table = useReactTable({
@@ -156,11 +170,10 @@ export default function ColumnTable(props) {
         <Text
           color={textColor}
           fontSize="22px"
-          mb="4px"
           fontWeight="700"
           lineHeight="100%"
         >
-          Liste Des Responsable Site
+          GARDE PAGE 
         </Text>
         <Menu />
       </Flex>

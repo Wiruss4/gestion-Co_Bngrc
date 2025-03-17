@@ -1,8 +1,8 @@
-// frontend/src/views/admin/profile/components/ProjectsAjoutPopup.js
+// frontend/src/views/admin/DataSite/components/ProjectsAjoutPopup.js
 import { useState } from "react";
 import { Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useToast } from "@chakra-ui/react";
-import SuiviForm from "./SuiviForm";
-import { addSuiviSiteHebergement, updateSuiviSiteHebergement } from "views/admin/profile/variables/Dataproject";
+import SuiviForm from "./DataSuiviForm";
+import { addSuiviSiteHebergement, updateSuiviSiteHebergement } from "views/admin/DataSite/variables/Dataproject";
 
 export default function ProjectsAjoutPopup({ isOpen, onClose, selectedSuivi }) {
   const toast = useToast();

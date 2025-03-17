@@ -1,4 +1,4 @@
-// frontend/src/views/admin/profile/components/UploadModifierPopup.js
+// frontend/src/views/admin/DataSite/components/UploadModifierPopup.js
 
 import React, { useState, useEffect } from 'react';
 import {

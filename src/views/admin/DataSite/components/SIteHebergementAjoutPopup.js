@@ -1,4 +1,4 @@
-// frontend/src/views/admin/profile/components/Upload.js
+// frontend/src/views/admin/DataSite/components/Upload.js
 
 import { useState, useEffect } from "react";
 import { 

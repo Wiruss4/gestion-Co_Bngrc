@@ -1,12 +1,12 @@
-// frontend/src/views/admin/profile/index.jsx
+// frontend/src/views/admin/DataSite/index.jsx
 // Chakra imports
 import { Box, Grid } from "@chakra-ui/react";
 
 // Custom components
-import General from "views/admin/profile/components/General";
-import Projects from "views/admin/profile/components/Projects";
-import Storage from "views/admin/profile/components/Storage";
-import Upload from "views/admin/profile/components/Upload";
+import GestionSecteur from "views/admin/DataSite/components/GestionSecteur";
+import DataSuiviSIte from "views/admin/DataSite/components/DataSuiviSIte";
+import SIteHebergement from "views/admin/DataSite/components/SIteHebergement";
+import Besoint from "views/admin/DataSite/components/Besoint";
 
 import React from "react";
 
@@ -18,43 +18,43 @@ export default function Overview() {
         templateRows={{ base: "repeat(4, auto)", md: "1fr 1fr" }}
         gap={{ base: "20px", md: "25px" }}>
         
-        {/* Table Storage en haut à gauche */}
-        <Storage
+        {/* Table SIteHebergement en haut à gauche */}
+        <SIteHebergement
           gridArea={{ base: "1 / 1 / 2 / 2", md: "1 / 1 / 2 / 2" }}
           used={25.6}
           total={50}
           minH={{ base: "auto", md: "300px", lg: "350px" }}
         />
 
-        {/* Table General en bas à droite */}
-        <General
+        {/* Table GestionSecteur en bas à droite */}
+        <GestionSecteur
           gridArea={{ base: "4 / 1 / 5 / 2", md: "2 / 2 / 3 / 3" }}
           minH={{ base: "auto", md: "300px", lg: "350px" }}
           pe="20px"
         />
 
-        {/* Table Upload en haut à droite
-        <Upload
+        {/* Table Besoint en haut à droite
+        <Besoint
           gridArea={{ base: "2 / 1 / 3 / 2", md: "1 / 2 / 2 / 3" }}
           minH={{ base: "auto", md: "300px", lg: "350px" }}
           pe="20px"
         /> */}
 
-        {/* Table Projects en bas à gauche */}
-        <Projects
+        {/* Table DataSuiviSIte en bas à gauche */}
+        <DataSuiviSIte
           gridArea={{ base: "3 / 1 / 4 / 2", md: "2 / 1 / 3 / 2" }}
           minH={{ base: "auto", md: "300px", lg: "350px" }}
         />
 
-         {/* Table Upload en haut à droite */}
-         <Upload
+         {/* Table Besoint en haut à droite */}
+         <Besoint
           gridArea={{ base: "2 / 1 / 3 / 2", md: "1 / 2 / 2 / 3" }}
           minH={{ base: "auto", md: "300px", lg: "350px" }}
           pe="20px"
         />
 
-        {/* Table General en bas à droite
-        <General
+        {/* Table GestionSecteur en bas à droite
+        <GestionSecteur
           gridArea={{ base: "4 / 1 / 5 / 2", md: "2 / 2 / 3 / 3" }}
           minH={{ base: "auto", md: "300px", lg: "350px" }}
           pe="20px"

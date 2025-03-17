@@ -1,4 +1,4 @@
-// frontend/src/views/admin/dataTables/components/DevelopmentTable.js
+// frontend/src/views/admin/DataRegion/components/DevelopmentTable.js
 'use client';
 /* eslint-disable */
 
@@ -26,8 +26,8 @@ import {
 } from '@tanstack/react-table';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import ImportPopup from "views/admin/dataTables/components/ImportPopup";
-import { handleImport } from "views/admin/dataTables/variables/imporDataDevelopment";
+import ImportPopup from "views/admin/DataRegion/components/ImportPopup";
+import { handleImport } from "views/admin/DataRegion/variables/imporDataDevelopment";
 
 
 

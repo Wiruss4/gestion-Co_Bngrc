@@ -1,4 +1,4 @@
-// frontend/src/views/admin/profile/components/General.js
+// frontend/src/views/admin/DataSite/components/GestionSecteur.js
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -7,11 +7,11 @@ import {
   VStack, HStack, Heading, Divider
 } from '@chakra-ui/react';
 import axios from 'axios';
-import GeneralAjoutPopup from './GeneralAjoutPopup';
+import GestionSecteurAjoutPopup from './GestionSecteurAjoutPopup';
 
 import Card from 'components/card/Card';
 
-export default function General() {
+export default function GestionSecteur() {
   const toast = useToast();
 
   // États COLONNE GAUCHE : Secteurs & Sous-secteurs
@@ -360,7 +360,7 @@ export default function General() {
         </Card>
       </Flex>
 
-      <GeneralAjoutPopup
+      <GestionSecteurAjoutPopup
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         type={popupType}

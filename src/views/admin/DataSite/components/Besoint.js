@@ -2,18 +2,18 @@
 
 import {
   Box, Flex, Input, Table, Thead, Tbody, Tr, Th, Td,
-  Button, useColorModeValue, Checkbox, useToast
+  Button, useColorModeValue, Checkbox, useToast, Text
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import Card from 'components/card/Card';
-import UploadAjoutPopup from './UploadAjoutPopup';
-import UploadModifierPopup from './UploadModifierPopup';
+import BesointAjoutPopup from './BesointAjoutPopup';
+import BesointModifierPopup from './BesointModifierPopup';
 
 const columnHelper = createColumnHelper();
 
-export default function Upload() {
+export default function Besoint() {
   const [sites, setSites] = useState([]);
   const [besoins, setBesoins] = useState([]);
   const [selectedSite, setSelectedSite] = useState('');
@@ -116,6 +116,11 @@ export default function Upload() {
 
   return (
     <Card p="25px">
+       <Flex flex="0" justify="left" align="center" mb="20px">
+          <Text color={textColor} fontSize="30px" fontWeight="700">
+            BESOINTS
+          </Text>
+        </Flex>
       <Flex justify="space-between" align="center" mb="20px" gap="10px">
         <Box position="relative" w="300px">
           <Input placeholder="Rechercher un site..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
@@ -161,8 +166,8 @@ export default function Upload() {
         </Table>
       </Box>
 
-      <UploadAjoutPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} idSite={selectedSite} />
-      <UploadModifierPopup isOpen={isPopupModifierOpen} onClose={() => setIsPopupModifierOpen(false)} idBesoin={selectedBesoins[0]} refreshData={() => axios.get(`http://localhost:4000/api/besoins-site?id_site=${selectedSite}`).then(res => setBesoins(res.data))} />
+      <BesointAjoutPopup isOpen={isPopupOpen} onClose={() => setIsPopupOpen(false)} idSite={selectedSite} />
+      <BesointModifierPopup isOpen={isPopupModifierOpen} onClose={() => setIsPopupModifierOpen(false)} idBesoin={selectedBesoins[0]} refreshData={() => axios.get(`http://localhost:4000/api/besoins-site?id_site=${selectedSite}`).then(res => setBesoins(res.data))} />
     </Card>
   );
 }

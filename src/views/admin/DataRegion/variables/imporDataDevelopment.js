@@ -1,4 +1,4 @@
-// frontend/src/views/admin/dataTables/variables/imporDataDevelopment.js
+// frontend/src/views/admin/DataRegion/variables/imporDataDevelopment.js
 import * as XLSX from "xlsx";
 
 // 📌 Vérification du nom du fichier et détection de la région existante

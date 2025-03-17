@@ -1,4 +1,4 @@
-// frontend/src/views/admin/profile/components/Projects.js
+// frontend/src/views/admin/DataSite/components/DataSuiviSIte.js
 'use client';
 /* eslint-disable */
 
@@ -39,7 +39,7 @@ import {
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import Card from 'components/card/Card';
-import ProjectsAjoutPopup from "views/admin/profile/components/ProjectsAjoutPopup";
+import DataSuiviSIteAjoutPopup from "views/admin/DataSite/components/DataSuiviSIteAjoutPopup";
 
 const columnHelper = createColumnHelper();
 
@@ -72,7 +72,15 @@ export default function SuiviSiteTable() {
 
   const [refreshKey, setRefreshKey] = useState(0);
   
+  useEffect(() => {
+    setSelectedRegion(localStorage.getItem("selectedRegion") || "ATSIMO ANDREFANA");
+    setSelectedCommune(localStorage.getItem("selectedCommune") || "");
+    setSelectedFokontany(localStorage.getItem("selectedFokontany") || "");
+    setSelectedSite(localStorage.getItem("selectedSite") || "");
+    setSelectedRows(JSON.parse(localStorage.getItem("selectedRows") || "[]"));
+  }, []);
   
+
   // ✅ Récupérer les données des suivis des sites d'hébergement
   useEffect(() => {
     axios
@@ -137,7 +145,10 @@ export default function SuiviSiteTable() {
     }
   }, [selectedRegion]);
 
-
+  useEffect(() => {
+    localStorage.setItem("selectedRows", JSON.stringify(selectedRows));
+  }, [selectedRows]);
+  
 
 
   // ✅ Charger uniquement les fokontany de la commune sélectionnée et qui ont des suivis
@@ -251,6 +262,7 @@ export default function SuiviSiteTable() {
   const handleClosePopup = () => {
     setIsPopupOpen(false);
     setSelectedSuivi(null);
+    setRefreshKey((prev) => prev + 1); // 🔥 Rafraîchir la table après l'ajout/modif
   };
 
   // ✅ Fonction pour supprimer les suivis sélectionnés
@@ -279,10 +291,16 @@ export default function SuiviSiteTable() {
 
   // ✅ Fonction pour cocher/décocher un suivi
   const toggleRowSelection = (suiviId) => {
-    setSelectedRows((prev) =>
-      prev.includes(suiviId) ? prev.filter((id) => id !== suiviId) : [...prev, suiviId]
-    );
+    setSelectedRows((prev) => {
+      const updatedSelection = prev.includes(suiviId)
+        ? prev.filter((id) => id !== suiviId)
+        : [...prev, suiviId];
+  
+      localStorage.setItem("selectedRows", JSON.stringify(updatedSelection));
+      return updatedSelection;
+    });
   };
+  
 
 
   const columns = [
@@ -539,7 +557,7 @@ export default function SuiviSiteTable() {
         <Button onClick={nextPage} isDisabled={pageIndex + rowsPerPage >= data.length}>▶</Button>
       </Flex>
       {/* ✅ Popup d'ajout/modification des suivis */}
-      <ProjectsAjoutPopup isOpen={isPopupOpen} onClose={handleClosePopup} selectedSuivi={selectedSuivi} />
+      <DataSuiviSIteAjoutPopup isOpen={isPopupOpen} onClose={handleClosePopup} selectedSuivi={selectedSuivi} />
       <AlertDialog
         isOpen={isDeleteOpen}
         leastDestructiveRef={cancelRef}

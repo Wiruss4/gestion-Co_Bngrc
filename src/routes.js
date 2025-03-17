@@ -15,8 +15,8 @@ import {
 // Admin Imports
 import MainDashboard from 'views/admin/default';
 import NFTMarketplace from 'views/admin/marketplace';
-import Profile from 'views/admin/profile';
-import DataTables from 'views/admin/dataTables';
+import DataSite from 'views/admin/DataSite';
+import DataRegion from 'views/admin/DataRegion';
 import RTL from 'views/admin/rtl';
 
 // Auth Imports
@@ -49,15 +49,15 @@ const routes = [
     name: 'Data Région',
     layout: '/admin',
     icon: <Icon as={MdBarChart} width="20px" height="20px" color="inherit" />,
-    path: '/data-tables',
-    component: <DataTables />,
+    path: '/Data-Region',
+    component: <DataRegion />,
   },
   {
     name: 'Data Site',
     layout: '/admin',
-    path: '/profile',
+    path: '/DataSite',
     icon: <Icon as={MdOutlineDataExploration} width="20px" height="20px" color="inherit" />,
-    component: <Profile />,
+    component: <DataSite />,
   },
   
   
