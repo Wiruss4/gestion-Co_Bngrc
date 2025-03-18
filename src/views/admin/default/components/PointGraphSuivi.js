@@ -1,4 +1,4 @@
-// frontend/src/views/admin/default/components/CheckTable.js
+// frontend/src/views/admin/default/components/PointGraphSuivi.js
 import { Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
 
 export default function CheckTable({ pointDetail }) {

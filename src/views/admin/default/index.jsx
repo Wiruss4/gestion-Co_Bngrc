@@ -10,6 +10,7 @@ import {
   FormLabel,
   Icon,
   Select,
+  Button,
   Text,
   SimpleGrid,
   useColorModeValue,
@@ -22,7 +23,7 @@ import {
   MdAddTask,
   MdEditCalendar,
   MdAddHome,
-  MdBarChart,
+  MdCalendarToday,
   MdFileCopy,
 } from 'react-icons/md';
 import axios from 'axios';
@@ -51,10 +52,22 @@ export default function UserReports() {
   const [selectedPoint, setSelectedPoint] = useState(null);
   const [pointDetail, setPointDetail] = useState(null);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [selectedMonth, setSelectedMonth] = useState("Tous les mois");
+  const [selectedDay, setSelectedDay] = useState(0);
+  const [daysInMonth, setDaysInMonth] = useState([]);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [tempSelectedDate, setTempSelectedDate] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(0);
 
   const brandColor = useColorModeValue('brand.500', 'white');
   const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
+
+  const formatDate = (day, month, year) => {
+    const date = new Date(year, month - 1, day);
+    return new Intl.DateTimeFormat('fr-FR', {
+      weekday: 'long',
+      day: 'numeric',
+    }).format(date);
+  };
 
   useEffect(() => {
     axios
@@ -69,21 +82,57 @@ export default function UserReports() {
   }, []);
 
   const months = [
-    "Tous les mois",
-    "Janvier",
-    "Février",
-    "Mars",
-    "Avril",
-    "Mai",
-    "Juin",
-    "Juillet",
-    "Août",
-    "Septembre",
-    "Octobre",
-    "Novembre",
-    "Décembre",
+    { value: 0, label: 'Tous les mois' },
+    { value: 1, label: 'Janvier' },
+    { value: 2, label: 'Février' },
+    { value: 3, label: 'Mars' },
+    { value: 4, label: 'Avril' },
+    { value: 5, label: 'Mai' },
+    { value: 6, label: 'Juin' },
+    { value: 7, label: 'Juillet' },
+    { value: 8, label: 'Août' },
+    { value: 9, label: 'Septembre' },
+    { value: 10, label: 'Octobre' },
+    { value: 11, label: 'Novembre' },
+    { value: 12, label: 'Décembre' },
   ];
-  const years = Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i);
+
+  // Calcul des jours disponibles
+  useEffect(() => {
+    const getDaysArray = () => {
+      if (selectedMonth === 0) return [];
+      const year = selectedYear;
+      const month = selectedMonth;
+      const days = new Date(year, month, 0).getDate();
+
+      const daysArray = [{ value: 0, label: 'Tous les jours' }];
+      for (let d = 1; d <= days; d++) {
+        daysArray.push({ value: d, label: d.toString() });
+      }
+      return daysArray;
+    };
+
+    setDaysInMonth(getDaysArray());
+    if (selectedMonth === 0) setSelectedDay(0);
+  }, [selectedMonth, selectedYear]);
+
+  // Formatage de l'affichage
+  const formatDateDisplay = () => {
+    if (selectedMonth === 0) return selectedYear.toString();
+    if (selectedDay === 0) {
+      return `${
+        months.find((m) => m.value === selectedMonth)?.label
+      } ${selectedYear}`;
+    }
+    return `${selectedDay} ${
+      months.find((m) => m.value === selectedMonth)?.label
+    } ${selectedYear}`;
+  };
+
+  const years = Array.from(
+    { length: 10 },
+    (_, i) => new Date().getFullYear() - i,
+  );
 
   return (
     <Box pt={{ base: '130px', md: '80px', xl: '80px' }}>
@@ -94,7 +143,7 @@ export default function UserReports() {
       >
         <MiniStatistics
           endContent={
-            <Flex me="16px" mt="10px" align="center">
+            <Flex me="px" mt="30px" align="center">
               <Select
                 onChange={(e) => setSelectedSite(e.target.value)}
                 value={selectedSite}
@@ -109,25 +158,42 @@ export default function UserReports() {
           }
           startContent={
             <IconBox
-              w="56px"
-              h="56px"
+              mt="30px"
+              w="40px"
+              h="40px"
               bg="linear-gradient(90deg, #4481EB 0%, #04BEFE 100%)"
               icon={
                 <Icon w="32px" h="32px" as={MdAddHome} color={brandColor} />
               }
             />
           }
-          name="SITE"
+          name="SITE Appliqué"
         />
+
+        {/* Sélecteur Jour */}
         <MiniStatistics
-          endContent={
-            <Flex me="px" mt="8px" direction="column" align="center">
-              {/* Sélection de l'année */}
+          startContent={
+            <IconBox
+              w="56px"
+              h="56px"
+              bg={boxBg}
+              icon={
+                <Icon
+                  w="32px"
+                  h="32px"
+                  as={MdEditCalendar}
+                  color={brandColor}
+                />
+              }
+            />
+          }
+          name="FILTRE DATE"
+          value={
+            <Flex direction="column">
               <Select
                 size="xs"
-                w="100px"
-                mb="5px"
-                onChange={(e) => setSelectedYear(e.target.value)}
+                mb={1}
+                onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                 value={selectedYear}
               >
                 {years.map((year) => (
@@ -137,34 +203,26 @@ export default function UserReports() {
                 ))}
               </Select>
 
-              {/* Sélection du mois */}
               <Select
                 size="xs"
-                w="100px"
-                onChange={(e) => setSelectedMonth(e.target.value)}
+                mb={1}
+                onChange={(e) => {
+                  const month = parseInt(e.target.value);
+                  setSelectedMonth(month);
+                  if (month === 0) setSelectedDay(0);
+                }}
                 value={selectedMonth}
               >
                 {months.map((month) => (
-                  <option key={month} value={month}>
-                    {month}
+                  <option key={month.value} value={month.value}>
+                    {month.label}
                   </option>
                 ))}
               </Select>
             </Flex>
           }
-          startContent={
-            <IconBox
-            mt="10px"
-              w="50px"
-              h="50px"
-              bg="linear-gradient(90deg, #4481EB 0%, #04BEFE 100%)"
-              icon={<Icon w="32px" h="32px" as={MdEditCalendar} color={"black"} />}
-            />
-            
-          }
-          name={<Text fontSize="20px" fontWeight="bold" color="gray.500">Filtre Date</Text>} // Augmente la taille du titre
         />
-        
+
         <MiniStatistics
           startContent={
             <IconBox
@@ -172,12 +230,34 @@ export default function UserReports() {
               h="56px"
               bg={boxBg}
               icon={
-                <Icon w="32px" h="32px" as={MdEditCalendar} color={brandColor} />
+                <Icon
+                  w="32px"
+                  h="32px"
+                  as={MdCalendarToday}
+                  color={brandColor}
+                />
               }
             />
           }
-          name="Spend this month"
-          value="$642.39"
+          name="Filtre appliqué"
+          value={
+            <Flex direction="column" gap="2">
+              <Select
+                size="xs"
+                mt="2"
+                isDisabled={selectedMonth === 0}
+                onChange={(e) => setSelectedDay(parseInt(e.target.value))}
+                value={selectedDay}
+              >
+                {daysInMonth.map((day) => (
+                  <option key={day.value} value={day.value}>
+                    {day.label}
+                  </option>
+                ))}
+              </Select>
+              <Text>{formatDateDisplay()}</Text>
+            </Flex>
+          }
         />
         <MiniStatistics growth="+23%" name="Sales" value="$574.34" />
 
@@ -213,12 +293,20 @@ export default function UserReports() {
         <Graphesuivi
           selectedSite={selectedSite}
           onPointSelect={(point) => setPointDetail(point)}
+          // Ajoutez ces nouvelles props
+          yearFilter={selectedYear}
+          monthFilter={selectedMonth}
+          dayFilter={selectedDay}
         />
+
         <WeeklyRevenue />
       </SimpleGrid>
 
       <SimpleGrid columns={{ base: 1, md: 1, xl: 2 }} gap="20px" mb="20px">
-        <PointGraphSuivi columnsData={columnsDataCheck} tableData={tableDataCheck} />
+        <PointGraphSuivi
+          columnsData={columnsDataCheck}
+          tableData={tableDataCheck}
+        />
         <SimpleGrid columns={{ base: 1, md: 2, xl: 2 }} gap="20px">
           <DailyTraffic />
           <PieCard />
